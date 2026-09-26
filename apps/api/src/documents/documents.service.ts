@@ -17,6 +17,7 @@ import { type Db, SupabaseService } from '../supabase/supabase.service.js';
 import {
   CHUNK_COLUMNS,
   DOCUMENT_COLUMNS,
+  DOCUMENT_SUMMARY_COLUMNS,
   toDocument,
   toDocumentChunk,
   toDocumentSummary,
@@ -60,7 +61,7 @@ export class DocumentsService {
   async list(user: AuthUser, query: ListDocumentsQuery): Promise<DocumentList> {
     const db = this.supabase.forUser(user.accessToken);
     const { data, count, error } = await applyListFilters(
-      db.from('documents').select(DOCUMENT_COLUMNS, { count: 'exact' }),
+      db.from('documents').select(DOCUMENT_SUMMARY_COLUMNS, { count: 'exact' }),
       query,
     )
       .order('updated_at', { ascending: false })

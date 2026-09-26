@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   type DocumentRow,
+  type DocumentSummaryRow,
   EXCERPT_LENGTH,
   toDocument,
   toDocumentChunk,
@@ -49,11 +50,19 @@ describe('toDocument', () => {
 });
 
 describe('toDocumentSummary', () => {
-  it('replaces the content with a plain-text excerpt', () => {
-    const summary = toDocumentSummary(row);
+  const { content, ...metadata } = row;
+  const summaryRow: DocumentSummaryRow = { ...metadata, excerpt: content.slice(0, 400) };
+
+  it('turns the stored excerpt into plain text and carries no content', () => {
+    const summary = toDocumentSummary(summaryRow);
     expect(summary).not.toHaveProperty('content');
     expect(summary.excerpt).toBe('Leave policy Employees get 25 days of paid leave.');
     expect(summary.ingestion.contentVersion).toBe(3);
+  });
+
+  it('cuts the stored 400-character prefix to the preview length', () => {
+    const summary = toDocumentSummary({ ...summaryRow, excerpt: 'word '.repeat(80) });
+    expect(summary.excerpt.length).toBeLessThanOrEqual(EXCERPT_LENGTH + 1);
   });
 });
 

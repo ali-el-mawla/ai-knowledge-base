@@ -12,9 +12,20 @@ import type { Tables } from '../database.types.js';
  * contracts out). The select lists live next to the row types they produce, so the
  * two cannot drift apart. `user_id` is never selected: ownership is implied by RLS.
  */
-export const DOCUMENT_COLUMNS =
-  'id, title, content, tags, content_version, ingestion_status, ingestion_error, chunk_count, ingested_at, created_at, updated_at';
-export type DocumentRow = Omit<Tables<'documents'>, 'user_id'>;
+const METADATA_COLUMNS =
+  'id, title, tags, content_version, ingestion_status, ingestion_error, chunk_count, ingested_at, created_at, updated_at';
+type MetadataRow = Omit<Tables<'documents'>, 'user_id' | 'content' | 'excerpt'>;
+
+/** One document, full content included. */
+export const DOCUMENT_COLUMNS = `${METADATA_COLUMNS}, content` as const;
+export type DocumentRow = MetadataRow & Pick<Tables<'documents'>, 'content'>;
+
+/**
+ * List rows carry the stored `excerpt` (the first 400 characters, a generated column)
+ * instead of the content, which can be 200k characters per row.
+ */
+export const DOCUMENT_SUMMARY_COLUMNS = `${METADATA_COLUMNS}, excerpt` as const;
+export type DocumentSummaryRow = MetadataRow & Pick<Tables<'documents'>, 'excerpt'>;
 
 export const CHUNK_COLUMNS = 'id, chunk_index, heading_path, content, token_estimate';
 export type ChunkRow = Pick<
@@ -31,7 +42,7 @@ export const EXCERPT_LENGTH = 180;
 // Only the start of a (possibly 200k character) document can end up in the excerpt.
 const EXCERPT_SCAN_LENGTH = 2_000;
 
-export function toIngestion(row: DocumentRow): DocumentIngestion {
+export function toIngestion(row: MetadataRow): DocumentIngestion {
   return {
     status: row.ingestion_status,
     error: row.ingestion_error,
@@ -53,12 +64,13 @@ export function toDocument(row: DocumentRow): Document {
   };
 }
 
-export function toDocumentSummary(row: DocumentRow): DocumentSummary {
+export function toDocumentSummary(row: DocumentSummaryRow): DocumentSummary {
   return {
     id: row.id,
     title: row.title,
     tags: row.tags,
-    excerpt: toExcerpt(row.content),
+    // Postgres types every generated column as nullable; content is never null, so neither is this.
+    excerpt: toExcerpt(row.excerpt ?? ''),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     ingestion: toIngestion(row),

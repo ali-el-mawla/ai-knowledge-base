@@ -58,13 +58,13 @@ isOneToOne: false
                   ]
                 },"documents": {
                   Row: {
-                    "chunk_count": number,"content": string,"content_version": number,"created_at": string,"id": string,"ingested_at": string | null,"ingestion_error": string | null,"ingestion_status": Database["public"]['Enums']["ingestion_status"],"tags": (string)[],"title": string,"updated_at": string,"user_id": string
+                    "chunk_count": number,"content": string,"content_version": number,"created_at": string,"excerpt": string | null,"id": string,"ingested_at": string | null,"ingestion_error": string | null,"ingestion_status": Database["public"]['Enums']["ingestion_status"],"tags": (string)[],"title": string,"updated_at": string,"user_id": string
                   }
                   Insert: {
-                    "chunk_count"?: number,"content": string,"content_version"?: number,"created_at"?: string,"id"?: string,"ingested_at"?: string | null,"ingestion_error"?: string | null,"ingestion_status"?: Database["public"]['Enums']["ingestion_status"],"tags"?: (string)[],"title": string,"updated_at"?: string,"user_id"?: string
+                    "chunk_count"?: number,"content": string,"content_version"?: number,"created_at"?: string,"excerpt"?: never,"id"?: string,"ingested_at"?: string | null,"ingestion_error"?: string | null,"ingestion_status"?: Database["public"]['Enums']["ingestion_status"],"tags"?: (string)[],"title": string,"updated_at"?: string,"user_id"?: string
                   }
                   Update: {
-                    "chunk_count"?: number,"content"?: string,"content_version"?: number,"created_at"?: string,"id"?: string,"ingested_at"?: string | null,"ingestion_error"?: string | null,"ingestion_status"?: Database["public"]['Enums']["ingestion_status"],"tags"?: (string)[],"title"?: string,"updated_at"?: string,"user_id"?: string
+                    "chunk_count"?: number,"content"?: string,"content_version"?: number,"created_at"?: string,"excerpt"?: never,"id"?: string,"ingested_at"?: string | null,"ingestion_error"?: string | null,"ingestion_status"?: Database["public"]['Enums']["ingestion_status"],"tags"?: (string)[],"title"?: string,"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     

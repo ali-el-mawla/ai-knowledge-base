@@ -1,10 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
+import type { EmbeddingModel } from '@repo/ai';
 import type { HealthResponse } from '@repo/shared';
+import { InjectEmbeddingModel } from '../ai/ai.module.js';
 import type { AppConfig } from '../config/app-config.js';
 import { InjectConfig } from '../config/config.module.js';
 import { SupabaseService } from '../supabase/supabase.service.js';
 
 const DB_PING_TIMEOUT_MS = 3_000;
+// A local model can take a few seconds to load into memory on its first call.
+const EMBEDDING_PING_TIMEOUT_MS = 5_000;
 
 @Injectable()
 export class HealthService {
@@ -13,6 +17,7 @@ export class HealthService {
   constructor(
     private readonly supabase: SupabaseService,
     @InjectConfig() private readonly config: AppConfig,
+    @InjectEmbeddingModel() private readonly embeddingModel: EmbeddingModel,
   ) {}
 
   /** `deep` also calls the embedding provider, which costs a request, so it is opt-in. */
@@ -50,12 +55,17 @@ export class HealthService {
     return !error;
   }
 
-  /**
-   * TODO(ingestion): embed one short text with the configured EmbeddingModel and return
-   * whether the provider answered (false on AiProviderError). Until the embedding client
-   * exists this returns null, which the response reports as "not checked".
-   */
-  private pingEmbeddingProvider(): Promise<boolean | null> {
-    return Promise.resolve(null);
+  /** Embeds one short text: proves the provider is reachable, the key works and the model exists. */
+  private async pingEmbeddingProvider(): Promise<boolean> {
+    try {
+      await this.embeddingModel.embed(['health check'], 'query', {
+        signal: AbortSignal.timeout(EMBEDDING_PING_TIMEOUT_MS),
+      });
+      return true;
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`Embedding provider health check failed: ${reason}`);
+      return false;
+    }
   }
 }
