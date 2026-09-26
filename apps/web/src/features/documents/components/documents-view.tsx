@@ -138,6 +138,7 @@ export function DocumentsView() {
             {updating ? (
               <Loader2Icon
                 className="mr-1.5 size-4 text-muted-foreground motion-safe:animate-spin"
+                role="img"
                 aria-label="Searching"
               />
             ) : (

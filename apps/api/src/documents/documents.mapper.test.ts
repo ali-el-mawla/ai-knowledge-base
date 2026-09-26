@@ -8,6 +8,7 @@ import {
   toDocumentSummary,
   toExcerpt,
   toTagCount,
+  withoutTitleHeading,
 } from './documents.mapper.js';
 
 const row: DocumentRow = {
@@ -56,8 +57,18 @@ describe('toDocumentSummary', () => {
   it('turns the stored excerpt into plain text and carries no content', () => {
     const summary = toDocumentSummary(summaryRow);
     expect(summary).not.toHaveProperty('content');
-    expect(summary.excerpt).toBe('Leave policy Employees get 25 days of paid leave.');
+    expect(summary.excerpt).toBe('Employees get 25 days of paid leave.');
     expect(summary.ingestion.contentVersion).toBe(3);
+  });
+
+  it('does not repeat the title when the document opens with it as a heading', () => {
+    const summary = toDocumentSummary({
+      ...summaryRow,
+      title: 'Employee Handbook',
+      excerpt:
+        '# employee handbook \n\nVersion 4.2.\n\n## About this handbook\n\nIt applies to all staff.',
+    });
+    expect(summary.excerpt).toBe('Version 4.2. About this handbook. It applies to all staff.');
   });
 
   it('cuts the stored 400-character prefix to the preview length', () => {
@@ -92,7 +103,40 @@ describe('toTagCount', () => {
   });
 });
 
+describe('withoutTitleHeading', () => {
+  it('drops an opening heading equal to the title, ignoring case and spacing', () => {
+    expect(withoutTitleHeading('# Leave policy\n\nBody.', 'Leave policy')).toBe('\n\nBody.');
+    expect(withoutTitleHeading('\n\n##  LEAVE  Policy ##\nBody.', ' leave policy ')).toBe(
+      '\nBody.',
+    );
+    expect(withoutTitleHeading('# Leave policy', 'Leave policy')).toBe('');
+  });
+
+  it('keeps an opening heading that differs from the title', () => {
+    const content = '# Leave policy 2026\n\nBody.';
+    expect(withoutTitleHeading(content, 'Leave policy')).toBe(content);
+  });
+
+  it('only looks at the first line', () => {
+    const content = 'Intro.\n\n# Leave policy\n\nBody.';
+    expect(withoutTitleHeading(content, 'Leave policy')).toBe(content);
+  });
+
+  it('does not treat a hashtag or an indented code line as a heading', () => {
+    const hashtag = '#leave policy\nBody.';
+    const code = '    # Leave policy\nBody.';
+    expect(withoutTitleHeading(hashtag, 'leave policy')).toBe(hashtag);
+    expect(withoutTitleHeading(code, 'Leave policy')).toBe(code);
+  });
+});
+
 describe('toExcerpt', () => {
+  it('ends a heading with a period unless it already has closing punctuation', () => {
+    expect(toExcerpt('## Scope\nAll staff.\n### Who pays?\nFinance.\n## Notes ##\nNone.')).toBe(
+      'Scope. All staff. Who pays? Finance. Notes. None.',
+    );
+  });
+
   it('strips headings, emphasis, inline code, quotes and list markers', () => {
     const markdown = [
       '## Setup',
@@ -100,7 +144,7 @@ describe('toExcerpt', () => {
       '- Run `npm run setup`',
       '1. Then __start__ it',
     ].join('\n');
-    expect(toExcerpt(markdown)).toBe('Setup Read this first. Run npm run setup Then start it');
+    expect(toExcerpt(markdown)).toBe('Setup. Read this first. Run npm run setup Then start it');
   });
 
   it('keeps link and image text but drops their URLs', () => {

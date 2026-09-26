@@ -6,11 +6,20 @@ import { cn } from '@/lib/utils';
 
 export type OpenSource = (source: Source, trigger: HTMLElement) => void;
 
+/**
+ * The source's heading trail inside its document. Most documents open with a heading equal
+ * to their title; that first step is left out, since the title is always shown next to it.
+ */
+export function sectionPath(source: Source): string {
+  const [first, ...rest] = source.headingPath.split(' > ');
+  const repeatsTitle = first?.trim().toLowerCase() === source.documentTitle.trim().toLowerCase();
+  return repeatsTitle ? rest.join(' > ') : source.headingPath;
+}
+
 /** Where the source came from, in one line: "Employee Handbook, Leave > Parental leave". */
 export function sourceLabel(source: Source): string {
-  return source.headingPath
-    ? `${source.documentTitle}, ${source.headingPath}`
-    : source.documentTitle;
+  const section = sectionPath(source);
+  return section ? `${source.documentTitle}, ${section}` : source.documentTitle;
 }
 
 /** A citation marker in an answer: a small numbered badge that opens its source. */
@@ -23,6 +32,7 @@ export function CitationChip({
   active: boolean;
   onOpen: OpenSource;
 }) {
+  const section = sectionPath(source);
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -44,7 +54,7 @@ export function CitationChip({
       </TooltipTrigger>
       <TooltipContent className="max-w-72 flex-col items-start gap-0.5">
         <span className="font-medium">{source.documentTitle}</span>
-        {source.headingPath && <span className="opacity-80">{source.headingPath}</span>}
+        {section && <span className="opacity-80">{section}</span>}
       </TooltipContent>
     </Tooltip>
   );

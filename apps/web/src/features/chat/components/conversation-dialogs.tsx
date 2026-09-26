@@ -35,10 +35,17 @@ interface DialogProps {
   conversation: Conversation;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Where focus goes when the dialog closes (call preventDefault to take over). */
+  onCloseAutoFocus?: (event: Event) => void;
 }
 
 /** Rename in a small dialog; it stays open (and busy) until the API answers. */
-export function RenameConversationDialog({ conversation, open, onOpenChange }: DialogProps) {
+export function RenameConversationDialog({
+  conversation,
+  open,
+  onOpenChange,
+  onCloseAutoFocus,
+}: DialogProps) {
   const rename = useRenameConversation();
   const [error, setError] = useState<string | null>(null);
   const inputId = useId();
@@ -81,7 +88,7 @@ export function RenameConversationDialog({ conversation, open, onOpenChange }: D
 
   return (
     <Dialog open={open} onOpenChange={close}>
-      <DialogContent>
+      <DialogContent onCloseAutoFocus={onCloseAutoFocus}>
         <form onSubmit={handleSubmit} noValidate className="grid gap-4">
           <DialogHeader>
             <DialogTitle>Rename conversation</DialogTitle>
@@ -128,6 +135,7 @@ export function DeleteConversationDialog({
   conversation,
   open,
   onOpenChange,
+  onCloseAutoFocus,
   onBeforeDelete,
   onDeleted,
 }: DialogProps & { onBeforeDelete?: () => void; onDeleted?: () => void }) {
@@ -150,7 +158,7 @@ export function DeleteConversationDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={(next) => !pending && onOpenChange(next)}>
-      <AlertDialogContent>
+      <AlertDialogContent onCloseAutoFocus={onCloseAutoFocus}>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete this conversation?</AlertDialogTitle>
           <AlertDialogDescription>

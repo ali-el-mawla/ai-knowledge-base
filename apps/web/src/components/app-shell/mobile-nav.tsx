@@ -25,7 +25,7 @@ export function MobileNav() {
           <MenuIcon />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-72 bg-sidebar p-0">
+      <SheetContent side="left" className="bg-sidebar p-0 data-[side=left]:w-72">
         <SheetHeader className="border-b">
           <SheetTitle>
             <AppLogo />

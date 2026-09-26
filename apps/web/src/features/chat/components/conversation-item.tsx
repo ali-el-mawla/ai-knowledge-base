@@ -4,7 +4,7 @@ import type { Conversation } from '@repo/shared';
 import { Loader2Icon, MoreHorizontalIcon, PencilIcon, Trash2Icon } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -36,6 +36,14 @@ export function ConversationItem({
   const router = useRouter();
   const stream = useChatSession();
   const [dialog, setDialog] = useState<'rename' | 'delete' | null>(null);
+  const actionsRef = useRef<HTMLButtonElement>(null);
+
+  // The dialogs open from a menu item that is gone by the time they close, so focus would
+  // fall back to the page; it returns to this conversation's actions button instead.
+  const returnFocus = useCallback((event: Event) => {
+    event.preventDefault();
+    actionsRef.current?.focus();
+  }, []);
 
   return (
     <li
@@ -50,7 +58,10 @@ export function ConversationItem({
         aria-current={active ? 'page' : undefined}
         className="grid min-w-0 flex-1 gap-0.5 rounded-lg px-2.5 py-2 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
       >
-        <span className={cn('truncate text-sm', active && 'font-medium')}>
+        <span
+          className={cn('truncate text-sm', active && 'font-medium')}
+          title={conversation.title}
+        >
           {conversation.title}
         </span>
         <time
@@ -64,12 +75,14 @@ export function ConversationItem({
       {answering && (
         <Loader2Icon
           className="size-3.5 shrink-0 text-muted-foreground motion-safe:animate-spin"
+          role="img"
           aria-label="Answering"
         />
       )}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
+            ref={actionsRef}
             variant="ghost"
             size="icon-xs"
             aria-label={`Actions for ${conversation.title}`}
@@ -93,11 +106,13 @@ export function ConversationItem({
         conversation={conversation}
         open={dialog === 'rename'}
         onOpenChange={(open) => setDialog(open ? 'rename' : null)}
+        onCloseAutoFocus={returnFocus}
       />
       <DeleteConversationDialog
         conversation={conversation}
         open={dialog === 'delete'}
         onOpenChange={(open) => setDialog(open ? 'delete' : null)}
+        onCloseAutoFocus={returnFocus}
         // An answer cannot be saved into a deleted conversation; stop it first.
         onBeforeDelete={answering ? stream.stop : undefined}
         onDeleted={active ? () => router.replace('/chat') : undefined}

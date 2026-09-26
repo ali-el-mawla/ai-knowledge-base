@@ -70,7 +70,7 @@ export function toDocumentSummary(row: DocumentSummaryRow): DocumentSummary {
     title: row.title,
     tags: row.tags,
     // Postgres types every generated column as nullable; content is never null, so neither is this.
-    excerpt: toExcerpt(row.excerpt ?? ''),
+    excerpt: toExcerpt(withoutTitleHeading(row.excerpt ?? '', row.title)),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     ingestion: toIngestion(row),
@@ -91,6 +91,32 @@ export function toTagCount(row: TagCountRow): TagCount {
   return { tag: row.tag, count: Number(row.count) };
 }
 
+/** An ATX heading line, `## Text` or `## Text ##`; group 1 is the text. */
+const HEADING = /^ {0,3}#{1,6}[ \t]+(.*?)(?:[ \t]+#+)?[ \t]*$/;
+const HEADING_LINES = new RegExp(HEADING.source, 'gm');
+
+function normaliseText(text: string): string {
+  return text.replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
+/**
+ * Drops the first line when it is a heading that repeats the title (most documents open
+ * with one), so a list that already shows the title does not show it twice. Any other
+ * opening heading is kept.
+ */
+export function withoutTitleHeading(content: string, title: string): string {
+  const body = content.replace(/^\s*\n/, ''); // leading blank lines
+  const lineEnd = body.search(/\r?\n|$/);
+  const heading = HEADING.exec(body.slice(0, lineEnd));
+  if (!heading || normaliseText(heading[1] ?? '') !== normaliseText(title)) return content;
+  return body.slice(lineEnd);
+}
+
+/** A heading ends with a period, so it does not run into the paragraph after it. */
+function headingToSentence(_line: string, text: string): string {
+  return !text || /[.!?:;]$/.test(text) ? text : `${text}.`;
+}
+
 /**
  * Plain-text preview of markdown for list views: markup roughly removed, whitespace
  * collapsed, cut on a word boundary. Not a markdown parser, and does not need to be.
@@ -102,7 +128,8 @@ export function toExcerpt(content: string, maxLength = EXCERPT_LENGTH): string {
     .replace(/^[\s|:*_-]{3,}$/gm, ' ') // horizontal rules and table separator rows
     .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1') // images -> alt text
     .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1') // links -> link text
-    .replace(/^\s{0,3}(?:#{1,6}|>+|[-*+]|\d+[.)])\s+/gm, '') // headings, quotes, list markers
+    .replace(HEADING_LINES, headingToSentence) // "## Scope" -> "Scope."
+    .replace(/^\s{0,3}(?:>+|[-*+]|\d+[.)])\s+/gm, '') // quotes, list markers
     .replace(/<\/?[a-z][^>]*>/gi, ' ') // inline html tags
     .replace(/[*~`]+|(?<!\w)_+|_+(?!\w)/g, '') // emphasis and code marks, not snake_case
     .replace(/\|/g, ' ') // table cell borders

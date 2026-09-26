@@ -102,12 +102,15 @@
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  /* A step darker than shadcn's 0.556, so small muted text stays above 4.5:1 on the muted
+     surfaces too (citation chips, the selected conversation), not only on white. */
+  --muted-foreground: oklch(0.53 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --success: oklch(0.527 0.154 150.069);
-  --warning: oklch(0.666 0.179 58.318);
+  /* Amber 700 rather than 600: it is used for small text, which needs 4.5:1 on white. */
+  --warning: oklch(0.555 0.163 48.998);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -223,6 +226,13 @@
   }
   .markdown table {
     @apply block w-full overflow-x-auto border-collapse text-left;
+  }
+  /* Wide tables and long code lines scroll inside their own box. Without inline-size
+     containment their full width would count as the minimum width of every grid or flex
+     item around them, stretching a chat answer or the source panel sideways instead. */
+  .markdown pre,
+  .markdown table {
+    contain: inline-size;
   }
   .markdown th,
   .markdown td {

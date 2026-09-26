@@ -25,7 +25,7 @@ function SourceButton({
         aria-pressed={active}
         title={sourceLabel(source)}
         className={cn(
-          'inline-flex h-6 max-w-56 items-center gap-1.5 rounded-md border px-1.5 text-xs transition-colors outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring',
+          'inline-flex h-6 max-w-72 items-center gap-1.5 rounded-md border px-1.5 text-xs transition-colors outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring',
           !cited && 'border-dashed text-muted-foreground',
           active && 'border-primary bg-muted text-foreground',
         )}
@@ -72,7 +72,9 @@ export function SourcesRow({
         {citedSources.length > 0 ? 'Sources' : 'No sources cited'}
       </span>
       {visible.length > 0 && (
-        <ul id={listId} className="flex flex-wrap gap-1.5" aria-label="Sources">
+        // contents: the chips flow on from the label like words, instead of the whole list
+        // dropping to the next line and leaving "Sources" alone on the first.
+        <ul id={listId} className="contents" aria-label="Sources">
           {visible.map((source) => (
             <SourceButton
               key={source.chunkId}
@@ -89,7 +91,9 @@ export function SourcesRow({
           type="button"
           onClick={() => setShowAll((value) => !value)}
           aria-expanded={showAll}
-          className="h-6 rounded-md px-1.5 text-xs text-muted-foreground underline-offset-4 outline-none hover:text-foreground hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+          aria-controls={visible.length > 0 ? listId : undefined}
+          // -mx-1.5: the text lines up with "Sources" when the row wraps.
+          className="-mx-1.5 h-6 rounded-md px-1.5 text-xs text-muted-foreground underline-offset-4 outline-none hover:text-foreground hover:underline focus-visible:ring-2 focus-visible:ring-ring"
         >
           {showAll ? 'Show cited only' : `${pluralize(others.length, 'more passage')} retrieved`}
         </button>

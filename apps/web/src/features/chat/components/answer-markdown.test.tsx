@@ -34,6 +34,17 @@ describe('AnswerMarkdown citations', () => {
     expect(screen.getByText(/Employees get 25 days/).textContent).toBe('Employees get 25 days 1.');
   });
 
+  it('does not repeat the title when the heading trail starts with it', () => {
+    const handbook = makeSource(1, {
+      documentTitle: 'Employee Handbook',
+      headingPath: 'Employee handbook > Leave > Parental leave',
+    });
+    renderAnswer('Sixteen weeks [1].', { sources: [handbook] });
+    expect(
+      screen.getByRole('button', { name: 'Source 1: Employee Handbook, Leave > Parental leave' }),
+    ).toBeTruthy();
+  });
+
   it('opens the source with the chip as the trigger, by click or keyboard activation', () => {
     const { onOpenSource } = renderAnswer('Claim [2].');
     const chip = screen.getByRole('button', { name: /Source 2/ });

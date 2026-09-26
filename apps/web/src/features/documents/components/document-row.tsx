@@ -19,14 +19,17 @@ export function DocumentRow({
   return (
     <li className="relative grid gap-1.5 px-4 py-3.5 transition-colors first:rounded-t-xl last:rounded-b-xl hover:bg-muted/50 has-[a:focus-visible]:bg-muted/50">
       <div className="flex items-start gap-3">
-        <h3 className="min-w-0 flex-1 truncate text-sm font-medium sm:text-base">
+        {/* Up to two lines rather than one truncated line, so a phone shows the title.
+            (A single nowrap line also counted its full width as the minimum width of every
+            grid around it, which pushed the whole page sideways on phones.) */}
+        <h2 className="line-clamp-2 min-w-0 flex-1 text-sm font-medium wrap-anywhere sm:text-base">
           <Link
             href={`/documents/${document.id}`}
             className="outline-none after:absolute after:inset-0 after:rounded-[inherit] focus-visible:after:ring-3 focus-visible:after:ring-ring/50"
           >
             {document.title}
           </Link>
-        </h3>
+        </h2>
         <DocumentStatusBadge ingestion={document.ingestion} className="relative z-10 shrink-0" />
       </div>
       {/* The API already turns the start of the markdown into plain text. */}

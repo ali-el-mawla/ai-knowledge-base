@@ -14,6 +14,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { sectionPath } from './citation-chip';
 
 function formatRank(rank: number | null, missing: string): string {
   return rank === null ? missing : `#${rank}`;
@@ -38,11 +39,17 @@ function RetrievalRanks({ score }: { score: Source['score'] }) {
   );
 }
 
+/**
+ * Every grid item here is `min-w-0`: by default a grid item is at least as wide as its
+ * content, so wide content in the passage (a table) would widen the whole panel and cut off
+ * the text around it, instead of scrolling inside its own box.
+ */
 function SourceBody({ source }: { source: Source }) {
   return (
     <div className="grid gap-5">
-      <div className="grid gap-2.5 text-xs">
-        <HeadingPath path={source.headingPath} />
+      <div className="grid min-w-0 gap-2.5 text-xs">
+        {/* The document title is the panel's title: the trail starts below it when it can. */}
+        <HeadingPath path={sectionPath(source) || source.headingPath} wrap />
         <Button asChild variant="outline" size="sm" className="justify-self-start">
           <Link href={`/documents/${source.documentId}`}>
             <ExternalLinkIcon aria-hidden />
@@ -50,15 +57,15 @@ function SourceBody({ source }: { source: Source }) {
           </Link>
         </Button>
       </div>
-      <section className="grid gap-1.5">
+      <section className="grid min-w-0 gap-1.5">
         <h3 className="text-xs font-medium text-muted-foreground">Retrieval ranks</h3>
         <RetrievalRanks score={source.score} />
       </section>
-      <section className="grid gap-1.5">
+      <section className="grid min-w-0 gap-1.5">
         <h3 className="text-xs font-medium text-muted-foreground">
           Passage, as it was when the answer was written
         </h3>
-        <div className="rounded-lg border bg-muted/30 p-3">
+        <div className="min-w-0 rounded-lg border bg-muted/30 p-3">
           <Markdown>{source.content}</Markdown>
         </div>
       </section>
@@ -87,7 +94,7 @@ function SourceColumn({ source, onClose }: { source: Source; onClose: () => void
   }, [source.chunkId]);
 
   return (
-    <aside
+    <section
       aria-labelledby={headingId}
       onKeyDown={(event) => {
         if (event.key === 'Escape') {
@@ -113,7 +120,7 @@ function SourceColumn({ source, onClose }: { source: Source; onClose: () => void
       <div className="min-h-0 flex-1 overflow-y-auto p-4">
         <SourceBody source={source} />
       </div>
-    </aside>
+    </section>
   );
 }
 
@@ -134,7 +141,11 @@ export function SourcePanel({
   if (docked) return source ? <SourceColumn source={source} onClose={onClose} /> : null;
   return (
     <Sheet open={source !== null} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent side="right" className="w-full gap-0 sm:max-w-md">
+      {/* The sheet sets its width with data-[side] variants; plain w-* classes lose to them. */}
+      <SheetContent
+        side="right"
+        className="gap-0 data-[side=right]:w-full data-[side=right]:sm:max-w-md"
+      >
         {source && (
           <>
             <SheetHeader className="border-b pr-12">

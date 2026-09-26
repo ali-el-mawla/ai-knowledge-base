@@ -59,7 +59,10 @@ export interface DocumentSummary {
   id: string;
   title: string;
   tags: string[];
-  /** First characters of the content, for list views. */
+  /**
+   * The start of the content as plain text, for list views. An opening heading that repeats
+   * the title is left out.
+   */
   excerpt: string;
   createdAt: string;
   updatedAt: string;

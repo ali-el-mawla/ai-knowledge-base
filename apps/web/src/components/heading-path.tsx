@@ -1,8 +1,19 @@
 import { ChevronRightIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-/** The heading trail of a chunk ("Leave > Parental leave") as a compact breadcrumb. */
-export function HeadingPath({ path, className }: { path: string; className?: string }) {
+/**
+ * The heading trail of a chunk ("Leave > Parental leave") as a compact breadcrumb. One
+ * truncated line by default; `wrap` shows it whole, for places with room to spare.
+ */
+export function HeadingPath({
+  path,
+  wrap = false,
+  className,
+}: {
+  path: string;
+  wrap?: boolean;
+  className?: string;
+}) {
   if (!path) {
     return (
       <span className={cn('text-muted-foreground italic', className)}>
@@ -13,7 +24,11 @@ export function HeadingPath({ path, className }: { path: string; className?: str
   const parts = path.split(' > ');
   return (
     <ol
-      className={cn('flex min-w-0 items-center gap-1 overflow-hidden', className)}
+      className={cn(
+        'flex min-w-0 items-center gap-x-1',
+        wrap ? 'flex-wrap gap-y-0.5' : 'overflow-hidden',
+        className,
+      )}
       aria-label="Section"
     >
       {parts.map((part, i) => (
@@ -23,7 +38,7 @@ export function HeadingPath({ path, className }: { path: string; className?: str
           )}
           <span
             className={cn(
-              'truncate',
+              wrap ? 'break-words' : 'truncate',
               i === parts.length - 1 ? 'font-medium' : 'text-muted-foreground',
             )}
           >
