@@ -1,5 +1,34 @@
-import { Module } from '@nestjs/common';
-import { HealthController } from './health/health.controller.js';
+import { type DynamicModule, Module } from '@nestjs/common';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { AuthModule } from './auth/auth.module.js';
+import { SupabaseAuthGuard } from './auth/supabase-auth.guard.js';
+import { ApiExceptionFilter } from './common/filters/api-exception.filter.js';
+import { RATE_LIMIT_OPTIONS, UserThrottlerGuard } from './common/rate-limit/rate-limit.js';
+import type { AppConfig } from './config/app-config.js';
+import { ConfigModule } from './config/config.module.js';
+import { DocumentsModule } from './documents/documents.module.js';
+import { HealthModule } from './health/health.module.js';
+import { SupabaseModule } from './supabase/supabase.module.js';
 
-@Module({ controllers: [HealthController] })
-export class AppModule {}
+@Module({
+  imports: [
+    ThrottlerModule.forRoot(RATE_LIMIT_OPTIONS),
+    SupabaseModule,
+    AuthModule,
+    DocumentsModule,
+    HealthModule,
+  ],
+  providers: [
+    { provide: APP_FILTER, useClass: ApiExceptionFilter },
+    // Global guards run in this order: identify the caller, then rate limit per caller.
+    { provide: APP_GUARD, useClass: SupabaseAuthGuard },
+    { provide: APP_GUARD, useClass: UserThrottlerGuard },
+  ],
+})
+export class AppModule {
+  /** The entry point validates the config and hands it in, so modules never read process.env. */
+  static forRoot(config: AppConfig): DynamicModule {
+    return { module: AppModule, imports: [ConfigModule.forRoot(config)] };
+  }
+}

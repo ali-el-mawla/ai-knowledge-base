@@ -10,7 +10,12 @@ export default defineConfig({
       { extends: true, test: { name: 'unit', include: ['src/**/*.test.ts'] } },
       {
         extends: true,
-        test: { name: 'integration', include: ['test/**/*.int.test.ts'], testTimeout: 30_000 },
+        test: {
+          name: 'integration',
+          include: ['test/**/*.int.test.ts'],
+          testTimeout: 30_000,
+          hookTimeout: 30_000,
+        },
       },
     ],
   },
