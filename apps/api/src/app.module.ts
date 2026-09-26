@@ -1,6 +1,7 @@
 import { type DynamicModule, Module } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { AiModule } from './ai/ai.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { SupabaseAuthGuard } from './auth/supabase-auth.guard.js';
 import { ApiExceptionFilter } from './common/filters/api-exception.filter.js';
@@ -15,6 +16,7 @@ import { SupabaseModule } from './supabase/supabase.module.js';
   imports: [
     ThrottlerModule.forRoot(RATE_LIMIT_OPTIONS),
     SupabaseModule,
+    AiModule,
     AuthModule,
     DocumentsModule,
     HealthModule,
