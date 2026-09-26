@@ -31,6 +31,7 @@ export interface AiConfig {
 type Env = Record<string, string | undefined>;
 
 const PLACEHOLDER_KEY = 'not-needed';
+const EMBEDDING_PROVIDERS = PRESET_NAMES.filter((name) => getPreset(name)?.embeddings);
 
 function read(env: Env, name: string): string | undefined {
   const value = env[name]?.trim();
@@ -103,7 +104,7 @@ function loadEmbeddingConfig(env: Env): EmbeddingModelConfig {
   const preset = resolvePreset(env, 'EMBEDDING_PROVIDER');
   if (!preset.embeddings) {
     throw new AiConfigError(
-      `Provider "${preset.name}" has no embeddings endpoint. Use ollama, openai, together or custom for EMBEDDING_PROVIDER.`,
+      `Provider "${preset.name}" has no embeddings endpoint. Use one of: ${EMBEDDING_PROVIDERS.join(', ')}.`,
     );
   }
   const model = read(env, 'EMBEDDING_MODEL');
