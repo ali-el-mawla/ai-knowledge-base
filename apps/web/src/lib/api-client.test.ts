@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { ApiError, createApiClient, parseErrorResponse } from './api-client';
+import { ApiError, createApiClient, parseErrorResponse, parseRetryAfter } from './api-client';
 
 function jsonResponse(status: number, body: unknown, headers: Record<string, string> = {}) {
   return new Response(JSON.stringify(body), {
@@ -50,9 +50,31 @@ describe('parseErrorResponse', () => {
     expect(error.isClientError).toBe(false);
   });
 
+  it('reads Retry-After on a rate-limited answer', async () => {
+    const error = await parseErrorResponse(
+      jsonResponse(
+        429,
+        { error: { code: 'RATE_LIMITED', message: 'Too many requests.', requestId: 'req-4' } },
+        { 'Retry-After': '42' },
+      ),
+    );
+    expect(error).toMatchObject({ code: 'RATE_LIMITED', status: 429, retryAfter: 42 });
+  });
+
   it('maps well-known statuses when the body has another shape', async () => {
     const error = await parseErrorResponse(jsonResponse(404, { message: 'nope' }));
     expect(error).toMatchObject({ code: 'NOT_FOUND', status: 404, requestId: null });
+  });
+});
+
+describe('parseRetryAfter', () => {
+  it('reads seconds and HTTP dates, and ignores anything else', () => {
+    const now = Date.parse('2026-09-26T10:00:00Z');
+    expect(parseRetryAfter('30', now)).toBe(30);
+    expect(parseRetryAfter('Sat, 26 Sep 2026 10:00:05 GMT', now)).toBe(5);
+    expect(parseRetryAfter('Sat, 26 Sep 2026 09:00:00 GMT', now)).toBe(0);
+    expect(parseRetryAfter('soon', now)).toBeNull();
+    expect(parseRetryAfter(null, now)).toBeNull();
   });
 });
 

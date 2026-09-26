@@ -237,4 +237,34 @@
   .markdown input[type='checkbox'] {
     @apply mr-1.5 align-middle;
   }
+
+  /* A blinking caret after the last word of a chat answer that is still being written. */
+  .streaming-caret > :last-child:not(ul, ol, pre, table)::after,
+  .streaming-caret > :is(ul, ol):last-child > li:last-child::after,
+  .streaming-caret > pre:last-child > code::after {
+    content: '';
+    display: inline-block;
+    width: 0.45em;
+    height: 1.1em;
+    margin-left: 0.15em;
+    vertical-align: -0.2em;
+    border-radius: 1px;
+    background: currentColor;
+    opacity: 0.7;
+    animation: caret-blink 1s steps(2, start) infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .streaming-caret > *::after,
+    .streaming-caret li::after,
+    .streaming-caret code::after {
+      animation: none;
+    }
+  }
+}
+
+@keyframes caret-blink {
+  to {
+    visibility: hidden;
+  }
 }

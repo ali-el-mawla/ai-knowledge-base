@@ -13,6 +13,8 @@ export class ApiError extends Error {
   readonly status: number;
   readonly requestId: string | null;
   readonly details: unknown;
+  /** Seconds to wait before trying again, from a `Retry-After` header (429, 503). */
+  readonly retryAfter: number | null;
 
   constructor(init: {
     code: ApiErrorCode | ClientErrorCode;
@@ -20,12 +22,14 @@ export class ApiError extends Error {
     status: number;
     requestId?: string | null;
     details?: unknown;
+    retryAfter?: number | null;
   }) {
     super(init.message);
     this.code = init.code;
     this.status = init.status;
     this.requestId = init.requestId ?? null;
     this.details = init.details;
+    this.retryAfter = init.retryAfter ?? null;
   }
 
   /** 4xx answers will not change on retry (bad input, missing resource, signed out). */
@@ -76,9 +80,23 @@ function codeForStatus(status: number): ApiErrorCode | ClientErrorCode {
   }
 }
 
+/**
+ * `Retry-After` as whole seconds: the header holds either a number of seconds or an HTTP
+ * date. Anything unreadable gives null, so callers fall back to their own wording.
+ */
+export function parseRetryAfter(value: string | null, now: number = Date.now()): number | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+  if (/^\d+$/.test(trimmed)) return Number.parseInt(trimmed, 10);
+  const date = Date.parse(trimmed);
+  if (Number.isNaN(date)) return null;
+  return Math.max(0, Math.ceil((date - now) / 1000));
+}
+
 /** Builds an `ApiError` from a non-2xx response, preferring the API's own error body. */
 export async function parseErrorResponse(response: Response): Promise<ApiError> {
   const body: unknown = await response.json().catch(() => null);
+  const retryAfter = parseRetryAfter(response.headers.get('retry-after'));
   if (isApiErrorBody(body)) {
     return new ApiError({
       code: body.error.code,
@@ -86,6 +104,7 @@ export async function parseErrorResponse(response: Response): Promise<ApiError> 
       status: response.status,
       requestId: body.error.requestId ?? response.headers.get('x-request-id'),
       details: body.error.details,
+      retryAfter,
     });
   }
   return new ApiError({
@@ -93,6 +112,7 @@ export async function parseErrorResponse(response: Response): Promise<ApiError> 
     message: `The server answered with an unexpected error (HTTP ${response.status}).`,
     status: response.status,
     requestId: response.headers.get('x-request-id'),
+    retryAfter,
   });
 }
 

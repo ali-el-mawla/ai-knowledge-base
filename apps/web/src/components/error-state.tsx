@@ -1,12 +1,10 @@
 'use client';
 
-import { useQueryClient } from '@tanstack/react-query';
 import { CloudOffIcon, LockIcon, TriangleAlertIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/empty-state';
+import { useSignInAgain } from '@/hooks/use-sign-in-again';
 import { getErrorMessage, isApiError } from '@/lib/api-client';
-import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 interface ErrorStateProps {
   error: unknown;
@@ -18,17 +16,9 @@ interface ErrorStateProps {
 
 /** Full-width error for a failed query, with the right way out for each kind of failure. */
 export function ErrorState({ error, title, onRetry, className }: ErrorStateProps) {
-  const router = useRouter();
-  const queryClient = useQueryClient();
+  const signInAgain = useSignInAgain();
 
   if (isApiError(error) && error.status === 401) {
-    async function signInAgain() {
-      await getSupabaseBrowserClient().auth.signOut({ scope: 'local' });
-      queryClient.clear();
-      const next = `${window.location.pathname}${window.location.search}`;
-      router.replace(`/login?next=${encodeURIComponent(next)}`);
-      router.refresh();
-    }
     return (
       <EmptyState
         className={className}

@@ -1,9 +1,10 @@
 'use client';
 
 import type { Document, DocumentChunk } from '@repo/shared';
-import { ChevronRightIcon, InfoIcon, Loader2Icon, TriangleAlertIcon } from 'lucide-react';
+import { InfoIcon, Loader2Icon, TriangleAlertIcon } from 'lucide-react';
 import { useState } from 'react';
 import { ErrorState } from '@/components/error-state';
+import { HeadingPath } from '@/components/heading-path';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,30 +14,6 @@ import { isIngesting, useDocumentChunks } from '../queries';
 
 const PREVIEW_CHARS = 480;
 const PREVIEW_LINES = 6;
-
-function HeadingPath({ path }: { path: string }) {
-  if (!path) return <span className="text-muted-foreground italic">Before the first heading</span>;
-  const parts = path.split(' > ');
-  return (
-    <ol className="flex min-w-0 items-center gap-1 overflow-hidden" aria-label="Section">
-      {parts.map((part, i) => (
-        <li key={i} className="flex min-w-0 items-center gap-1">
-          {i > 0 && (
-            <ChevronRightIcon className="size-3 shrink-0 text-muted-foreground" aria-hidden />
-          )}
-          <span
-            className={cn(
-              'truncate',
-              i === parts.length - 1 ? 'font-medium' : 'text-muted-foreground',
-            )}
-          >
-            {part}
-          </span>
-        </li>
-      ))}
-    </ol>
-  );
-}
 
 function ChunkCard({ chunk }: { chunk: DocumentChunk }) {
   const [expanded, setExpanded] = useState(false);
