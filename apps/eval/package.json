@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run --passWithNoTests",
-    "eval": "node dist/run.js"
+    "eval": "npm run build && node dist/run.js"
   },
   "dependencies": {
     "@repo/ai": "*",
