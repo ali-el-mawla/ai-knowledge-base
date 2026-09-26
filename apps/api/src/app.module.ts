@@ -4,12 +4,14 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { AiModule } from './ai/ai.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { SupabaseAuthGuard } from './auth/supabase-auth.guard.js';
+import { ChatModule } from './chat/chat.module.js';
 import { ApiExceptionFilter } from './common/filters/api-exception.filter.js';
 import { RATE_LIMIT_OPTIONS, UserThrottlerGuard } from './common/rate-limit/rate-limit.js';
 import type { AppConfig } from './config/app-config.js';
 import { ConfigModule } from './config/config.module.js';
 import { DocumentsModule } from './documents/documents.module.js';
 import { HealthModule } from './health/health.module.js';
+import { RetrievalModule } from './retrieval/retrieval.module.js';
 import { SupabaseModule } from './supabase/supabase.module.js';
 
 @Module({
@@ -19,6 +21,8 @@ import { SupabaseModule } from './supabase/supabase.module.js';
     AiModule,
     AuthModule,
     DocumentsModule,
+    RetrievalModule,
+    ChatModule,
     HealthModule,
   ],
   providers: [
