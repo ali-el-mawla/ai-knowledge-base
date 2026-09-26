@@ -20,7 +20,7 @@ Base URL: `http://127.0.0.1:4000/api`. Types live in `packages/shared` and are s
 | GET    | `/tags`                       |                                                       | `{ items: TagCount[] }`                                                 |
 | POST   | `/search`                     | `{ query, mode: hybrid \| vector \| keyword, limit }` | `SearchResponse`                                                        |
 | GET    | `/conversations`              |                                                       | `ConversationList` (most recent first)                                  |
-| POST   | `/conversations`              | `{ title? }`                                          | `201 Conversation`                                                      |
+| POST   | `/conversations`              | `{ title? }` (body optional)                          | `201 Conversation`                                                      |
 | GET    | `/conversations/:id`          |                                                       | `ConversationWithMessages`                                              |
 | PATCH  | `/conversations/:id`          | `{ title }`                                           | `Conversation`                                                          |
 | DELETE | `/conversations/:id`          |                                                       | `204`                                                                   |
@@ -36,5 +36,7 @@ event: delta   data: { text }            (many)
 event: done    data: { message }         (the saved assistant message)
 event: error   data: { code, message }   (instead of done, if generation fails)
 ```
+
+Rate limits: 300 requests per minute per route and user; the chat route allows 20 messages per minute per user (`429 RATE_LIMITED` with `Retry-After`). A conversation still called "New conversation" is renamed from its first question.
 
 Closing the connection aborts the upstream model call; the partial answer is saved with `status: "aborted"`. Browsers cannot send an `Authorization` header with `EventSource`, so the web app reads the stream with `fetch` and the `createSseParser()` from `@repo/shared`.
