@@ -1,0 +1,28 @@
+{
+  "name": "@repo/eval",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Retrieval evaluation: chunking strategies x retrieval modes, hit@k and MRR on a hand-written question set.",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run --passWithNoTests",
+    "eval": "node dist/run.js"
+  },
+  "dependencies": {
+    "@repo/ai": "*",
+    "@repo/rag": "*",
+    "@repo/shared": "*",
+    "@supabase/supabase-js": "^2.117.2"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "@types/node": "^22.15.0",
+    "eslint": "^9.39.5",
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.2"
+  }
+}

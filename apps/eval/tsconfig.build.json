@@ -1,0 +1,6 @@
+{
+  "extends": "@repo/typescript-config/library.json",
+  "compilerOptions": { "rootDir": "src", "outDir": "dist", "types": ["node"] },
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts", "src/testing"]
+}
