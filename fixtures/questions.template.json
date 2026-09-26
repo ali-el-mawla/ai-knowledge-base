@@ -1,0 +1,44 @@
+[
+  {
+    "id": "q01",
+    "question": "What does expense code EXP-TRV-04 cover?",
+    "document": "travel-and-expense-policy.md",
+    "answer": "Meals and incidentals per diem",
+    "type": "exact-code"
+  },
+  {
+    "id": "q02",
+    "question": "How fast does a Premium Support customer get a first response on a P1 ticket?",
+    "document": "customer-support-sla.md",
+    "answer": "15 minutes, 24/7",
+    "type": "table"
+  },
+  {
+    "id": "q03",
+    "question": "What is the largest page size a list request to the Quaylark API can ask for?",
+    "document": "product-api-specification.md",
+    "answer": "Page size: default 50, maximum 200 items",
+    "type": "nested-heading"
+  },
+  {
+    "id": "q04",
+    "question": "If someone resigns six months after receiving a retention bonus, how much do they have to pay back?",
+    "document": "employee-handbook.md",
+    "answer": "they repay 100% of the gross amount",
+    "type": "ambiguous-term"
+  },
+  {
+    "id": "q05",
+    "question": "How old can a webhook timestamp be before the signature check throws the event away?",
+    "document": "product-api-specification.md",
+    "answer": "more than 300 seconds old",
+    "type": "code-block"
+  },
+  {
+    "id": "q06",
+    "question": "How much paid time off does the main carer get when a new baby arrives?",
+    "document": "employee-handbook.md",
+    "answer": "18 weeks at full base pay",
+    "type": "paraphrase"
+  }
+]
