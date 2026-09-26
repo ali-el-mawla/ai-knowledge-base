@@ -30,7 +30,7 @@ The chat and embedding models are fakes (`apps/api/test/support/fake-models.ts`)
 
 ## Retrieval evaluation
 
-`npm run eval` indexes `fixtures/corpus` with two chunking strategies, searches it with three retrieval modes and scores the answers to `fixtures/questions.json` (hit@1, hit@5, MRR). It writes the report to [`docs/EVAL.md`](EVAL.md). It needs the embedding model but makes no chat calls.
+`npm run eval` indexes `fixtures/corpus` with two chunking strategies, searches it with three retrieval modes and scores the answers to `fixtures/questions.json` (hit@1, hit@3, hit@5, MRR@10). It writes the report to [`docs/EVAL.md`](EVAL.md). It needs the embedding model but makes no chat calls.
 
 ## End-to-end smoke test
 

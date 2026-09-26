@@ -20,7 +20,8 @@ import { packSegments, splitFramed, splitLines, splitProse, trailingSentences } 
  *    sentences of the previous one, so a fact cut at a boundary is findable from both sides.
  *
  * The hard limit includes the header: buildEmbeddingText(title, headingPath, content)
- * never exceeds maxChars, because the embedding model rejects oversized input.
+ * never exceeds maxChars, because the embedding model silently truncates oversized input
+ * (the tail of the chunk would be stored but never embedded).
  */
 export const chunkMarkdown: Chunker = (input, options) => {
   const resolved = resolveChunkerOptions(options);

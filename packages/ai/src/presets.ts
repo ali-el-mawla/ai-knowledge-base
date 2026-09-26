@@ -76,7 +76,8 @@ export const PROVIDER_PRESETS = {
   // https://docs.together.ai/reference/chat-completions-1 (temperature "from 0-1",
   // no stream_options) and https://docs.together.ai/reference/embeddings-2 (no dimensions).
   // Usage arrives in a final chunk unasked. The embeddings batch limit is not documented:
-  // 64 is our conservative choice.
+  // 64 is our conservative choice. Note (26 Sep 2026): Together currently offers no
+  // serverless embedding models, so embeddings need a dedicated endpoint (untested).
   together: {
     name: 'together',
     baseUrl: 'https://api.together.ai/v1',

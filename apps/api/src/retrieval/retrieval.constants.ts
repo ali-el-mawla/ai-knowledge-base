@@ -3,8 +3,9 @@ import type { RetrievalMode } from '@repo/shared';
 /**
  * Retrieval tuning, in one place on purpose: these numbers decide answer quality and cost.
  *
- * - `chatSources` (6): chunks given to the model per answer. Chunks are about 1,200
- *   characters, so 6 sources are roughly 1,800 tokens of evidence: enough for an answer
+ * - `chatSources` (6): chunks given to the model per answer. Chunks target 1,200
+ *   characters (the demo corpus averages about 490, since its sections are short), so 6
+ *   sources are at most about 1,800 tokens of evidence and usually far less: enough for an answer
  *   spread over a few sections, small enough that the relevant chunk is not buried and
  *   every answer stays cheap. It is also the default `limit` of `POST /search`.
  * - `rrfK` (60): the constant of Reciprocal Rank Fusion, `score = sum(weight / (k + rank))`,

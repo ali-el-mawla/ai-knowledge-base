@@ -292,9 +292,9 @@ function limitations(input: ReportInput): string {
       'and so favours keyword search; real users phrase things less predictably. ' +
       'A hit is decided by answer-span matching: a chunk that gives the answer in other words, or a span cut in two by a chunk boundary, ' +
       'counts as a miss, and a chunk that happens to contain the span counts as a hit even if it is not the best passage. ' +
-      'Keyword scores often tie (several chunks share the top score, usually through a title or heading match), and ' +
-      '`hybrid_search` breaks ties by the order rows happen to be stored in, so re-indexing the same chunks can move a ' +
-      'borderline rank; the vector index (HNSW) is approximate as well. ' +
+      'Keyword scores often tie (several chunks share the top score, usually through a title or heading match); ' +
+      '`hybrid_search` breaks those ties by content hash, so rankings are repeatable, but which tied chunk wins is arbitrary. ' +
+      'The vector index (HNSW) is approximate as well. ' +
       `Only one embedding model (\`${input.embedding.model}\`) and one set of chunk sizes were tested; ` +
       'another model or other sizes could change the ranking of the strategies. ' +
       'This measures retrieval only, not the quality of the answers the chat model writes from the retrieved chunks.',

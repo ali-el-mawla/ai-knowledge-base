@@ -18,8 +18,8 @@ export interface ChunkerOptions {
   /** Paragraphs are merged until a chunk reaches about this many characters. */
   targetChars: number;
   /**
-   * Hard ceiling for header + content. nomic-embed-text under Ollama accepts 2048
-   * tokens and errors beyond; 2,000 characters is roughly 500 tokens, far below it.
+   * Hard ceiling for header + content. nomic-embed-text under Ollama reads at most
+   * 2,048 tokens and silently truncates the rest; 2,000 characters is roughly 500 tokens, far below it.
    */
   maxChars: number;
   /** Sentence overlap carried into the next chunk, only when one section is split. */
