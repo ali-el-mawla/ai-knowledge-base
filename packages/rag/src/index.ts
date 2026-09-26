@@ -1,8 +1,14 @@
 export * from './header.js';
 export * from './types.js';
-// Added in WP3, exported from here:
-//   chunkMarkdown: Chunker        (structure-aware, ./chunker/markdown.ts)
-//   chunkFixedSize: Chunker       (naive baseline for the eval, ./chunker/naive.ts)
-//   buildAnswerMessages({ question, sources, history }): PromptMessage[]   (./prompt.ts)
-//   buildRewriteMessages({ question, history }): PromptMessage[]           (./prompt.ts)
-//   parseCitations(text, sourceCount): number[]; stripCitations(text): string   (./citations.ts)
+export { chunkMarkdown } from './chunker/markdown.js';
+export { chunkFixedSize } from './chunker/naive.js';
+export {
+  ANSWER_SYSTEM_PROMPT,
+  REWRITE_SYSTEM_PROMPT,
+  PROMPT_LIMITS,
+  buildAnswerMessages,
+  buildRewriteMessages,
+  type AnswerPromptInput,
+  type RewritePromptInput,
+} from './prompt.js';
+export { parseCitations, stripCitations } from './citations.js';

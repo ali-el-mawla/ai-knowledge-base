@@ -7,7 +7,19 @@ import { createHash } from 'node:crypto';
  * policy > Parental leave" is not). A free, deterministic version of contextual retrieval.
  */
 export function buildChunkHeader(title: string, headingPath: string): string {
-  return headingPath ? `${title} > ${headingPath}` : title;
+  const path = withoutLeadingTitle(title, headingPath);
+  return path ? `${title} > ${path}` : title;
+}
+
+const SEPARATOR = ' > ';
+
+/** Most documents open with an H1 equal to their title; repeating it wastes embedding space. */
+function withoutLeadingTitle(title: string, headingPath: string): string {
+  const [first, ...rest] = headingPath.split(SEPARATOR);
+  const normalize = (text: string) => text.trim().toLowerCase();
+  return first !== undefined && normalize(first) === normalize(title)
+    ? rest.join(SEPARATOR)
+    : headingPath;
 }
 
 /** The exact text sent to the embedding model (the model adds its own task prefix). */
