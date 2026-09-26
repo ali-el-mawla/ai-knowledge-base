@@ -1,0 +1,8 @@
+node_modules
+dist
+.next
+.turbo
+coverage
+supabase/.temp
+apps/api/src/database.types.ts
+docs/EVAL.md

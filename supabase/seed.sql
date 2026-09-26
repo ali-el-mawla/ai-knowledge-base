@@ -1,0 +1,2 @@
+-- Local development seed. Demo users and documents are created by `npm run seed`
+-- through the API, so they go through the real ingestion pipeline.

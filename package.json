@@ -1,0 +1,39 @@
+{
+  "name": "ai-knowledge-base",
+  "private": true,
+  "description": "AI-powered knowledge base: documents, hybrid RAG retrieval and a streaming chat with citations.",
+  "type": "module",
+  "packageManager": "npm@10.9.2",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:integration": "turbo run test:integration",
+    "eval": "turbo run build --filter=@repo/eval^... && npm run eval --workspace=@repo/eval",
+    "seed": "npm run seed --workspace=@repo/api",
+    "reembed": "npm run reembed --workspace=@repo/api",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:migrate": "supabase migration up",
+    "db:reset": "supabase db reset",
+    "db:types": "node scripts/gen-types.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2",
+    "supabase": "2.118.0",
+    "turbo": "^2.11.4",
+    "typescript": "~6.0.3"
+  }
+}
