@@ -1,0 +1,200 @@
+import type { ApiErrorBody, ApiErrorCode } from '@repo/shared';
+import { getPublicEnv } from '@/lib/env';
+import { getAccessToken } from '@/lib/supabase/client';
+
+/** Codes produced by the client itself, when there is no usable answer from the API. */
+export type ClientErrorCode = 'NETWORK_ERROR' | 'INVALID_RESPONSE';
+
+/** Every failed API call rejects with this, so the UI can branch on `code` and `status`. */
+export class ApiError extends Error {
+  override readonly name = 'ApiError';
+  readonly code: ApiErrorCode | ClientErrorCode;
+  /** HTTP status, or 0 when the request never got an answer. */
+  readonly status: number;
+  readonly requestId: string | null;
+  readonly details: unknown;
+
+  constructor(init: {
+    code: ApiErrorCode | ClientErrorCode;
+    message: string;
+    status: number;
+    requestId?: string | null;
+    details?: unknown;
+  }) {
+    super(init.message);
+    this.code = init.code;
+    this.status = init.status;
+    this.requestId = init.requestId ?? null;
+    this.details = init.details;
+  }
+
+  /** 4xx answers will not change on retry (bad input, missing resource, signed out). */
+  get isClientError(): boolean {
+    return this.status >= 400 && this.status < 500;
+  }
+}
+
+export function isApiError(error: unknown): error is ApiError {
+  return error instanceof ApiError;
+}
+
+/** A message that is safe to show to the user for any thrown value. */
+export function getErrorMessage(error: unknown): string {
+  if (error instanceof ApiError) return error.message;
+  if (error instanceof Error && error.message) return error.message;
+  return 'Something went wrong. Please try again.';
+}
+
+function isApiErrorBody(body: unknown): body is ApiErrorBody {
+  if (typeof body !== 'object' || body === null || !('error' in body)) return false;
+  const error = (body as { error: unknown }).error;
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    typeof (error as { code?: unknown }).code === 'string' &&
+    typeof (error as { message?: unknown }).message === 'string'
+  );
+}
+
+/** Used when the body is not the documented error shape (a proxy page, an empty 502, ...). */
+function codeForStatus(status: number): ApiErrorCode | ClientErrorCode {
+  switch (status) {
+    case 400:
+      return 'BAD_REQUEST';
+    case 401:
+      return 'UNAUTHORIZED';
+    case 404:
+      return 'NOT_FOUND';
+    case 409:
+      return 'CONFLICT';
+    case 413:
+      return 'PAYLOAD_TOO_LARGE';
+    case 429:
+      return 'RATE_LIMITED';
+    default:
+      return status >= 500 ? 'INTERNAL' : 'INVALID_RESPONSE';
+  }
+}
+
+/** Builds an `ApiError` from a non-2xx response, preferring the API's own error body. */
+export async function parseErrorResponse(response: Response): Promise<ApiError> {
+  const body: unknown = await response.json().catch(() => null);
+  if (isApiErrorBody(body)) {
+    return new ApiError({
+      code: body.error.code,
+      message: body.error.message,
+      status: response.status,
+      requestId: body.error.requestId ?? response.headers.get('x-request-id'),
+      details: body.error.details,
+    });
+  }
+  return new ApiError({
+    code: codeForStatus(response.status),
+    message: `The server answered with an unexpected error (HTTP ${response.status}).`,
+    status: response.status,
+    requestId: response.headers.get('x-request-id'),
+  });
+}
+
+export type QueryParams = Record<string, string | number | boolean | null | undefined>;
+
+export interface RequestOptions {
+  query?: QueryParams;
+  body?: unknown;
+  signal?: AbortSignal;
+}
+
+export interface ApiClientConfig {
+  /** Base URL including the `/api` prefix. A function so it is resolved lazily. */
+  baseUrl: string | (() => string);
+  getAccessToken: () => Promise<string | null>;
+  fetch?: typeof fetch;
+}
+
+export interface ApiClient {
+  request<T>(method: string, path: string, options?: RequestOptions): Promise<T>;
+  /** Like `request`, but hands back the raw response (for streams). Errors are still thrown. */
+  raw(method: string, path: string, options?: RequestOptions): Promise<Response>;
+  get<T>(path: string, options?: Omit<RequestOptions, 'body'>): Promise<T>;
+  post<T>(path: string, body?: unknown, options?: Omit<RequestOptions, 'body'>): Promise<T>;
+  patch<T>(path: string, body?: unknown, options?: Omit<RequestOptions, 'body'>): Promise<T>;
+  delete<T = void>(path: string, options?: Omit<RequestOptions, 'body'>): Promise<T>;
+}
+
+function buildUrl(baseUrl: string, path: string, query?: QueryParams): string {
+  const url = new URL(`${baseUrl.replace(/\/+$/, '')}${path}`);
+  for (const [key, value] of Object.entries(query ?? {})) {
+    if (value === undefined || value === null || value === '') continue;
+    url.searchParams.set(key, String(value));
+  }
+  return url.toString();
+}
+
+/**
+ * A small typed wrapper around `fetch` for the API: attaches the Supabase access token,
+ * serialises JSON bodies, parses JSON answers and turns every failure into an `ApiError`.
+ */
+export function createApiClient(config: ApiClientConfig): ApiClient {
+  const fetchImpl = config.fetch ?? ((...args: Parameters<typeof fetch>) => fetch(...args));
+
+  async function raw(method: string, path: string, options: RequestOptions = {}) {
+    const baseUrl = typeof config.baseUrl === 'function' ? config.baseUrl() : config.baseUrl;
+    const token = await config.getAccessToken();
+    const headers = new Headers({ Accept: 'application/json' });
+    if (token) headers.set('Authorization', `Bearer ${token}`);
+    if (options.body !== undefined) headers.set('Content-Type', 'application/json');
+
+    let response: Response;
+    try {
+      response = await fetchImpl(buildUrl(baseUrl, path, options.query), {
+        method,
+        headers,
+        body: options.body === undefined ? undefined : JSON.stringify(options.body),
+        signal: options.signal,
+      });
+    } catch (error) {
+      // Aborts are intentional (TanStack Query cancels stale requests); let them through as-is.
+      if (error instanceof DOMException && error.name === 'AbortError') throw error;
+      throw new ApiError({
+        code: 'NETWORK_ERROR',
+        message: 'Could not reach the server. Check that the API is running and try again.',
+        status: 0,
+      });
+    }
+
+    if (!response.ok) throw await parseErrorResponse(response);
+    return response;
+  }
+
+  async function request<T>(method: string, path: string, options?: RequestOptions): Promise<T> {
+    const response = await raw(method, path, options);
+    if (response.status === 204) return undefined as T;
+    const text = await response.text();
+    if (!text) return undefined as T;
+    try {
+      return JSON.parse(text) as T;
+    } catch {
+      throw new ApiError({
+        code: 'INVALID_RESPONSE',
+        message: 'The server sent a response that is not valid JSON.',
+        status: response.status,
+        requestId: response.headers.get('x-request-id'),
+      });
+    }
+  }
+
+  return {
+    request,
+    raw,
+    get: (path, options) => request('GET', path, options),
+    post: (path, body, options) => request('POST', path, { ...options, body }),
+    patch: (path, body, options) => request('PATCH', path, { ...options, body }),
+    delete: (path, options) => request('DELETE', path, options),
+  };
+}
+
+/** The app-wide client: API URL from the environment, token from the browser Supabase session. */
+export const apiClient = createApiClient({
+  baseUrl: () => getPublicEnv().apiUrl,
+  getAccessToken,
+});
