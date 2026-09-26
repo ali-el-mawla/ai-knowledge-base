@@ -77,7 +77,8 @@ describe('documents: the owner', () => {
     const item = response.body.items.find((candidate) => candidate.id === doc.id);
     expect(item).toMatchObject({
       title: 'Refund policy',
-      excerpt: 'Refunds Refunds are accepted within 30 days.',
+      // The heading differs from the title, so it stays, ended with a period.
+      excerpt: 'Refunds. Refunds are accepted within 30 days.',
     });
     expect(item).not.toHaveProperty('content');
   });
