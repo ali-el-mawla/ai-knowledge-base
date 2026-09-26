@@ -227,6 +227,10 @@
   .markdown th,
   .markdown td {
     @apply border px-3 py-1.5 align-top;
+    /* In narrow panels a table scrolls sideways instead of breaking words letter by
+       letter (the container's overflow-wrap: anywhere would let cells shrink to one character). */
+    overflow-wrap: normal;
+    min-width: 7rem;
   }
   .markdown th {
     @apply bg-muted/60 font-medium;
