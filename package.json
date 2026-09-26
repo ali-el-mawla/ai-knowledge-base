@@ -19,6 +19,7 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "test:integration": "turbo run test:integration",
+    "test:e2e": "npm run test:e2e --workspace=@repo/web",
     "eval": "turbo run build --filter=@repo/eval^... && npm run eval --workspace=@repo/eval",
     "seed": "npm run seed --workspace=@repo/api",
     "reembed": "npm run reembed --workspace=@repo/api",

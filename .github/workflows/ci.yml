@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# A newer push to the same branch or pull request replaces the run in progress.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  TURBO_TELEMETRY_DISABLED: 1
+
+jobs:
+  checks:
+    name: Format, lint, typecheck, unit tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # There is no .env in CI. `next build` inlines NEXT_PUBLIC_* values into the browser
+      # bundle; the app reads them lazily, so the build passes without them, but the bundle
+      # would throw on first use. Harmless placeholders: this build is checked, never deployed.
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-placeholder-publishable-key
+      NEXT_PUBLIC_API_URL: http://127.0.0.1:4000/api
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Restore the Turborepo cache
+        uses: actions/cache@v6
+        with:
+          path: .turbo/cache
+          key: turbo-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check formatting
+        run: npx prettier --check .
+
+      - name: Lint, typecheck, unit tests and build
+        run: npx turbo run lint typecheck test build
+
+  database:
+    name: Migrations and API integration tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The pinned Supabase CLI (a devDependency) starts Postgres, Auth, PostgREST and the
+      # API gateway in Docker and applies every migration to an empty database, so a broken
+      # migration fails here. Studio, its metadata service and the mail inbox are not needed.
+      - name: Start local Supabase
+        run: npx supabase start --exclude studio,postgres-meta,mailpit
+
+      # The defaults from .env.example plus this stack's URL and keys. Those keys are the
+      # CLI's local development keys, not secrets. The model settings are only validated:
+      # the tests never call a real model (fakes stand in), so no Ollama and no API key.
+      - name: Write .env for the local stack
+        run: |
+          status="$(npx supabase status -o json)"
+          url="$(jq --exit-status --raw-output .API_URL <<< "$status")"
+          publishable="$(jq --exit-status --raw-output .PUBLISHABLE_KEY <<< "$status")"
+          secret="$(jq --exit-status --raw-output .SECRET_KEY <<< "$status")"
+          {
+            grep --extended-regexp --invert-match '^SUPABASE_(URL|PUBLISHABLE_KEY|SECRET_KEY)=' .env.example
+            printf 'SUPABASE_URL=%s\nSUPABASE_PUBLISHABLE_KEY=%s\nSUPABASE_SECRET_KEY=%s\n' \
+              "$url" "$publishable" "$secret"
+          } > .env
+
+      - name: Build the packages the API depends on
+        run: npx turbo run build --filter=@repo/api^...
+
+      - name: API integration tests (real Postgres and RLS, fake AI models)
+        run: npm run test:integration --workspace=@repo/api
+
+      - name: Stop Supabase
+        if: always()
+        run: npx supabase stop --no-backup
