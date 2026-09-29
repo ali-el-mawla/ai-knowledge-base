@@ -267,7 +267,8 @@ describe('ChatService: a complete answer', () => {
       limit: 6,
       signal: expect.any(AbortSignal),
     });
-    expect(chat.requests[0]).toMatchObject({ maxTokens: 1024, temperature: 0.2 });
+    expect(chat.requests[0]).toMatchObject({ maxTokens: 1024 });
+    expect(chat.requests[0]).not.toHaveProperty('temperature');
   });
 
   it('puts the sources first and the question last in the prompt', async () => {
@@ -326,7 +327,7 @@ describe('ChatService: query rewriting', () => {
     const { rewrite, search, sink, run, conversations } = followUp();
     await run(FOLLOW_UP);
 
-    expect(rewrite.requests[0]).toMatchObject({ maxTokens: 120, temperature: 0 });
+    expect(rewrite.requests[0]).toMatchObject({ maxTokens: 120 });
     const rewritePrompt = rewrite.lastMessages().at(-1)?.content ?? '';
     // Earlier answers go in without their [n] markers, which pointed at other sources.
     expect(rewritePrompt).toContain('Assistant: You get 25 days.');

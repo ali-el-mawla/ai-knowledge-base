@@ -114,13 +114,14 @@ Re-running it on a machine that is already set up takes about 10 seconds: every 
 
 Windows 11, Core i7 (11th gen), 16 GB RAM, NVIDIA MX450 with 2 GB. Timings from single runs, 26 Sep 2026.
 
-| What                                               | Result                                                           |
-| -------------------------------------------------- | ---------------------------------------------------------------- |
-| Seeding the 8-document corpus (127 chunks)         | about 18 s, embedded with `nomic-embed-text` on the GPU          |
-| Embedding one question                             | about 0.02 s                                                     |
-| Editing one paragraph of a 22-chunk document       | 1 chunk embedded, 21 reused, about 0.36 s                        |
-| Chat with `claude-haiku-4-5`                       | first token after about 1.4 s, complete answer after about 2.5 s |
-| Chat with `qwen2.5:1.5b` on Ollama (provider swap) | about 75 s for the first call (model load), then about 7 s       |
+| What                                               | Result                                                                     |
+| -------------------------------------------------- | -------------------------------------------------------------------------- |
+| Seeding the 8-document corpus (127 chunks)         | about 18 s, embedded with `nomic-embed-text` on the GPU                    |
+| Embedding one question                             | about 0.02 s                                                               |
+| Editing one paragraph of a 22-chunk document       | 1 chunk embedded, 21 reused, about 0.36 s                                  |
+| Chat with `claude-sonnet-5` (the default)          | first token after about 2 to 3 s, complete answer after about 3.5 to 4.5 s |
+| Chat with `claude-haiku-4-5`                       | first token after about 1.4 s, complete answer after about 2.5 s           |
+| Chat with `qwen2.5:1.5b` on Ollama (provider swap) | about 75 s for the first call (model load), then about 7 s                 |
 
 ## Architecture
 
@@ -146,7 +147,7 @@ flowchart LR
   end
 
   emb["Embedding provider<br/>Ollama nomic-embed-text"]
-  llm["Chat provider<br/>Anthropic claude-haiku-4-5"]
+  llm["Chat provider<br/>Anthropic claude-sonnet-5"]
 
   browser --> web
   browser -- "sign in, sign up" --> auth
@@ -288,7 +289,8 @@ There are two independent slots, each configured in the root `.env`:
 ```bash
 # Anthropic (verified, the default)
 CHAT_PROVIDER=anthropic
-CHAT_MODEL=claude-haiku-4-5
+CHAT_MODEL=claude-sonnet-5
+REWRITE_MODEL=claude-haiku-4-5
 CHAT_API_KEY=<your Anthropic key>
 
 # Ollama, fully local (verified; run `ollama pull qwen2.5:1.5b` first)
@@ -322,7 +324,7 @@ CHAT_BASE_URL=http://127.0.0.1:8000/v1
 CHAT_MODEL=<model name>
 ```
 
-Optional: `REWRITE_MODEL=<a smaller model of the same provider>` for follow-up rewriting.
+Optional: `REWRITE_MODEL=<a smaller model of the same provider>` for follow-up rewriting. Optional: `CHAT_TEMPERATURE` (0 to 2) is sent only when set, because newer models such as `claude-sonnet-5` and OpenAI's reasoning models reject the parameter (found when switching the default to Sonnet 5).
 
 **Embeddings**
 

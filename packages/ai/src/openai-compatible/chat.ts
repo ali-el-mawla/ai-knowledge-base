@@ -22,6 +22,7 @@ export class OpenAICompatibleChatModel implements ChatModel {
   readonly info: ModelDescriptor;
   readonly #capabilities: ChatCapabilities;
   readonly #client: OpenAI;
+  readonly #defaultTemperature: number | null;
 
   constructor(config: ChatModelConfig, options: ClientOptions = {}) {
     if (!config.preset.chat) {
@@ -29,6 +30,7 @@ export class OpenAICompatibleChatModel implements ChatModel {
     }
     this.info = { provider: config.preset.name, model: config.model };
     this.#capabilities = config.preset.chat;
+    this.#defaultTemperature = config.temperature ?? null;
     this.#client = createOpenAIClient(config.baseUrl, config.apiKey, options);
   }
 
@@ -99,9 +101,11 @@ export class OpenAICompatibleChatModel implements ChatModel {
       })),
     };
     params[maxTokensParam] = request.maxTokens;
-    if (request.temperature !== undefined) {
+    // Omitted unless the request or the configuration sets it: some models reject it.
+    const temperature = request.temperature ?? this.#defaultTemperature;
+    if (temperature !== null) {
       const [min, max] = temperatureRange;
-      params.temperature = Math.min(Math.max(request.temperature, min), max);
+      params.temperature = Math.min(Math.max(temperature, min), max);
     }
     return params;
   }

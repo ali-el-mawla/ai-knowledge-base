@@ -44,6 +44,12 @@ describe('loadAiConfig: chat', () => {
     expect(config.chatDisabledReason).toBe('CHAT_API_KEY is not set for "anthropic"');
   });
 
+  it('omits the temperature unless CHAT_TEMPERATURE is set, and validates it', () => {
+    expect(load({}).chat?.temperature).toBeNull();
+    expect(load({ CHAT_TEMPERATURE: '0.2' }).chat?.temperature).toBe(0.2);
+    expect(() => load({ CHAT_TEMPERATURE: 'hot' })).toThrow(AiConfigError);
+  });
+
   it('accepts ollama without a key', () => {
     const { chat } = load({
       CHAT_PROVIDER: 'ollama',

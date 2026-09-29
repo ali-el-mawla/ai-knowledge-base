@@ -7,6 +7,11 @@ export interface ChatModelConfig {
   baseUrl: string;
   apiKey: string;
   model: string;
+  /**
+   * Sent only when set (CHAT_TEMPERATURE). Newer models such as Claude Sonnet 5 and
+   * OpenAI's reasoning models reject the parameter, so the default is to omit it.
+   */
+  temperature: number | null;
 }
 
 export interface EmbeddingModelConfig {
@@ -91,6 +96,7 @@ function loadChatConfig(env: Env): Pick<AiConfig, 'chat' | 'rewrite' | 'chatDisa
     baseUrl: resolveBaseUrl(env, 'CHAT_BASE_URL', preset),
     apiKey: apiKey ?? PLACEHOLDER_KEY,
     model,
+    temperature: readTemperature(env),
   };
   const rewriteModel = read(env, 'REWRITE_MODEL');
   return {
@@ -98,6 +104,16 @@ function loadChatConfig(env: Env): Pick<AiConfig, 'chat' | 'rewrite' | 'chatDisa
     rewrite: rewriteModel ? { ...chat, model: rewriteModel } : chat,
     chatDisabledReason: null,
   };
+}
+
+function readTemperature(env: Env): number | null {
+  const raw = read(env, 'CHAT_TEMPERATURE');
+  if (raw === undefined) return null;
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < 0 || value > 2) {
+    throw new AiConfigError('CHAT_TEMPERATURE must be a number from 0 to 2, or empty to omit it.');
+  }
+  return value;
 }
 
 function loadEmbeddingConfig(env: Env): EmbeddingModelConfig {

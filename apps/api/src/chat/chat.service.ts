@@ -22,10 +22,13 @@ import { ConversationsService, DEFAULT_CONVERSATION_TITLE } from './conversation
 
 /** Generation settings of the chat, next to the retrieval ones in `RETRIEVAL`. */
 export const CHAT_SETTINGS = {
-  /** Low temperature: answers should follow the sources, not improvise. */
-  answer: { maxTokens: 1024, temperature: 0.2 },
-  /** Deterministic and short: a rewrite is one search query, not an answer. */
-  rewrite: { maxTokens: 120, temperature: 0 },
+  /**
+   * No temperature here: newer models (Claude Sonnet 5, OpenAI reasoning models) reject
+   * it. Grounding comes from the prompt rules; CHAT_TEMPERATURE sets one if a model needs it.
+   */
+  answer: { maxTokens: 1024 },
+  /** Short: a rewrite is one search query, not an answer. */
+  rewrite: { maxTokens: 120 },
   /** A longer "rewrite" means the model answered instead (same cap as a search query). */
   rewriteMaxChars: 500,
   /** Earlier messages loaded for the prompt; the prompt builder applies the same cap. */

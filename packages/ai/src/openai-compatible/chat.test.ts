@@ -24,7 +24,13 @@ function preset(chat: Partial<ChatCapabilities> = {}): ProviderPreset {
 }
 
 function config(from: ProviderPreset = preset()): ChatModelConfig {
-  return { preset: from, baseUrl: from.baseUrl, apiKey: 'test-key', model: 'test-model' };
+  return {
+    preset: from,
+    baseUrl: from.baseUrl,
+    apiKey: 'test-key',
+    model: 'test-model',
+    temperature: null,
+  };
 }
 
 const REQUEST: ChatRequest = {
@@ -103,6 +109,14 @@ describe('OpenAI-compatible chat: request mapping', () => {
       fetch: http.fetch,
     }).complete({ ...REQUEST, temperature: requested });
     expect(http.requests[0]?.body.temperature).toBe(sent);
+  });
+
+  it('uses the configured temperature when the request has none', async () => {
+    const http = fakeFetch(() => json(completion('ok')));
+    await createChatModel({ ...config(), temperature: 0.3 }, { fetch: http.fetch }).complete(
+      REQUEST,
+    );
+    expect(http.requests[0]?.body.temperature).toBe(0.3);
   });
 
   it('omits temperature when the caller does not set one', async () => {
