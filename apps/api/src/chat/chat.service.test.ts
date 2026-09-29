@@ -383,15 +383,16 @@ describe('ChatService: history', () => {
 
     expect(conversations.requestedHistory).toBe(CHAT_SETTINGS.historyMessages);
     expect(CHAT_SETTINGS.historyMessages).toBe(6);
-    const history = chat.lastMessages().slice(1, -1);
-    // The partial answer is left out; the prompt starts with a user turn.
-    expect(history.map((message) => message.content)).toEqual([
+    const messages = chat.lastMessages();
+    // The partial answer is left out and the prompt starts with a user turn. The unanswered
+    // question is joined with the new one, so user and assistant turns still alternate.
+    expect(messages.slice(1, -1).map((message) => message.content)).toEqual([
       'Question 4',
       'Answer 4',
       'Question 5',
       'Answer 5',
-      'Unanswered',
     ]);
+    expect(messages.at(-1)?.content.startsWith('Unanswered\n\n<sources>')).toBe(true);
   });
 });
 
@@ -412,7 +413,7 @@ describe('ChatService: stopping', () => {
     expect(error).not.toHaveBeenCalled();
   });
 
-  it('saves nothing when the client leaves before the first word', async () => {
+  it('saves no answer when the client leaves before the first word', async () => {
     const { sink, run, disconnect, conversations } = setup({ answer: { hangUntilAborted: true } });
     sink.onEvent = (event) => {
       if (event.type === 'start') disconnect.abort();
@@ -422,7 +423,7 @@ describe('ChatService: stopping', () => {
     expect(conversations.assistantMessages()).toEqual([]);
   });
 
-  it('does not retrieve or open the stream when the client leaves during the rewrite', async () => {
+  it('does not retrieve, save or open the stream when the client leaves during the rewrite', async () => {
     const { sink, run, disconnect, search, conversations } = setup({
       rewrite: { hangUntilAborted: true },
     });
@@ -431,7 +432,20 @@ describe('ChatService: stopping', () => {
     await run('And part-timers?');
     expect(search).not.toHaveBeenCalled();
     expect(sink.calls).toEqual([]);
+    // Only the two seeded messages: the follow-up was not saved.
+    expect(conversations.messages).toHaveLength(2);
     expect(warn).not.toHaveBeenCalled();
+  });
+
+  it('saves nothing and opens no stream when the client leaves during retrieval', async () => {
+    const { sink, run, disconnect, search, conversations } = setup();
+    search.mockImplementation(() => {
+      disconnect.abort();
+      return Promise.resolve(SOURCES);
+    });
+    await run();
+    expect(sink.calls).toEqual([]);
+    expect(conversations.messages).toEqual([]);
   });
 });
 
@@ -542,5 +556,20 @@ describe('ChatService: failures before the stream started (JSON errors)', () => 
     );
     await expect(run()).rejects.toBeInstanceOf(EmbeddingUnavailableError);
     expect(sink.calls).toEqual([]);
+  });
+
+  it('saves neither the question nor a title when retrieval fails, so a retry adds no duplicate', async () => {
+    const { run, search, conversations } = setup();
+    search.mockRejectedValueOnce(
+      EmbeddingUnavailableError.from(new AiProviderError('unavailable', 'down', 'ollama')),
+    );
+    await expect(run()).rejects.toBeInstanceOf(EmbeddingUnavailableError);
+    expect(conversations.messages).toEqual([]);
+    expect(conversations.conversation.title).toBe(DEFAULT_CONVERSATION_TITLE);
+
+    await run(); // the retry
+    expect(conversations.messages.filter((message) => message.role === 'user')).toEqual([
+      expect.objectContaining({ content: QUESTION }),
+    ]);
   });
 });

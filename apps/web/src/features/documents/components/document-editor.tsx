@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard';
 import { getErrorMessage, isApiError } from '@/lib/api-client';
-import { formatNumber } from '@/lib/format';
+import { formatDate, formatDateTime, formatNumber, formatRelativeTime } from '@/lib/format';
 import {
   isIngesting,
   useCreateDocument,
@@ -58,10 +58,13 @@ function useSaveShortcut(formRef: React.RefObject<HTMLFormElement | null>, enabl
 function EditorToolbar({
   heading,
   status,
+  meta,
   actions,
 }: {
   heading: string;
   status?: React.ReactNode;
+  /** A muted line under the heading. */
+  meta?: React.ReactNode;
   actions: React.ReactNode;
 }) {
   return (
@@ -72,13 +75,31 @@ function EditorToolbar({
             <ArrowLeftIcon />
           </Link>
         </Button>
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          <h1 className="truncate text-base font-semibold">{heading}</h1>
-          {status}
+        <div className="grid min-w-0 flex-1">
+          <div className="flex min-w-0 items-center gap-2">
+            <h1 className="truncate text-base font-semibold">{heading}</h1>
+            {status}
+          </div>
+          {meta ? <p className="truncate text-xs text-muted-foreground">{meta}</p> : null}
         </div>
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">{actions}</div>
       </div>
     </div>
+  );
+}
+
+/** "Created 26 Sep 2026 · Updated 5 minutes ago", with the exact times on hover. */
+function DocumentDates({ document }: { document: Document }) {
+  return (
+    <>
+      <time dateTime={document.createdAt} title={formatDateTime(document.createdAt)}>
+        Created {formatDate(document.createdAt)}
+      </time>
+      {' · '}
+      <time dateTime={document.updatedAt} title={formatDateTime(document.updatedAt)}>
+        Updated {formatRelativeTime(document.updatedAt)}
+      </time>
+    </>
   );
 }
 
@@ -229,6 +250,7 @@ function EditDocumentEditor({
       <EditorToolbar
         heading={form.saved.title || 'Untitled'}
         status={<DocumentStatusBadge ingestion={document.ingestion} className="shrink-0" />}
+        meta={<DocumentDates document={document} />}
         actions={
           <>
             <Tooltip>

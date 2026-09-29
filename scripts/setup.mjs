@@ -103,35 +103,7 @@ if (!existsSync(envPath)) {
   ok('.env already exists (kept as is)');
 }
 
-step('Checking Docker (Supabase runs in Docker)');
-if (!run('docker', ['info'], { capture: true, allowFailure: true }).ok) {
-  fail(
-    'Docker is not running.',
-    'Start Docker Desktop (or the Docker daemon) and run `npm run setup` again.',
-  );
-}
-ok('Docker is running');
-
-step('Starting local Supabase (first run downloads images, a few minutes)');
-run('npx', ['supabase', 'start']);
-{
-  const status = run('npx', ['supabase', 'status', '-o', 'json'], { capture: true });
-  const jsonStart = status.stdout.indexOf('{');
-  const info = JSON.parse(status.stdout.slice(jsonStart));
-  const filled = fillEmptyEnv({
-    SUPABASE_URL: info.API_URL,
-    SUPABASE_PUBLISHABLE_KEY: info.PUBLISHABLE_KEY,
-    SUPABASE_SECRET_KEY: info.SECRET_KEY,
-    NEXT_PUBLIC_SUPABASE_URL: info.API_URL,
-    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: info.PUBLISHABLE_KEY,
-  });
-  ok(filled.length ? `filled in .env: ${filled.join(', ')}` : 'Supabase keys already in .env');
-}
-
-step('Applying database migrations');
-run('npx', ['supabase', 'migration', 'up']);
-ok('database schema is up to date');
-
+// Before Supabase: without Ollama, setup should stop in seconds, not after the image downloads.
 step('Checking the embedding model');
 {
   const env = readEnv();
@@ -169,6 +141,35 @@ step('Checking the embedding model');
     ok(`EMBEDDING_PROVIDER=${provider} (${model}); make sure EMBEDDING_API_KEY is set`);
   }
 }
+
+step('Checking Docker (Supabase runs in Docker)');
+if (!run('docker', ['info'], { capture: true, allowFailure: true }).ok) {
+  fail(
+    'Docker is not running.',
+    'Start Docker Desktop (or the Docker daemon) and run `npm run setup` again.',
+  );
+}
+ok('Docker is running');
+
+step('Starting local Supabase (first run downloads images, a few minutes)');
+run('npx', ['supabase', 'start']);
+{
+  const status = run('npx', ['supabase', 'status', '-o', 'json'], { capture: true });
+  const jsonStart = status.stdout.indexOf('{');
+  const info = JSON.parse(status.stdout.slice(jsonStart));
+  const filled = fillEmptyEnv({
+    SUPABASE_URL: info.API_URL,
+    SUPABASE_PUBLISHABLE_KEY: info.PUBLISHABLE_KEY,
+    SUPABASE_SECRET_KEY: info.SECRET_KEY,
+    NEXT_PUBLIC_SUPABASE_URL: info.API_URL,
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: info.PUBLISHABLE_KEY,
+  });
+  ok(filled.length ? `filled in .env: ${filled.join(', ')}` : 'Supabase keys already in .env');
+}
+
+step('Applying database migrations');
+run('npx', ['supabase', 'migration', 'up']);
+ok('database schema is up to date');
 
 step('Building shared packages and the API');
 run('npx', ['turbo', 'run', 'build', '--filter=@repo/api...']);

@@ -35,6 +35,12 @@ export function formatRelativeTime(iso: string, now: number = Date.now()): strin
   return dateFormat.format(time);
 }
 
+/** "26 Sep 2026". */
+export function formatDate(iso: string): string {
+  const time = new Date(iso).getTime();
+  return Number.isNaN(time) ? '' : dateFormat.format(time);
+}
+
 export function formatDateTime(iso: string): string {
   const time = new Date(iso).getTime();
   return Number.isNaN(time) ? '' : dateTimeFormat.format(time);

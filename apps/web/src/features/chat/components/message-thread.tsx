@@ -82,6 +82,8 @@ export function MessageThread({
               rewrittenQuery={message.rewrittenQuery}
               activeIndex={activeIndexFor(message.id, selection)}
               onOpenSource={onOpenSource}
+              usage={message.usage}
+              model={message.model}
             />
           )}
         </li>

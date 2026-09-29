@@ -9,8 +9,6 @@ import { API_PREFIX, configureApp } from './app.setup.js';
 import { ConfigError, loadAppConfig } from './config/app-config.js';
 import { SchemaMismatchError } from './supabase/embedding-dimensions.check.js';
 
-const HOST = '127.0.0.1';
-
 async function bootstrap(): Promise<void> {
   const config = loadAppConfig(process.env);
   const app = await NestFactory.create<NestExpressApplication>(AppModule.forRoot(config), {
@@ -18,8 +16,10 @@ async function bootstrap(): Promise<void> {
     abortOnError: false,
   });
   configureApp(app, config);
-  await app.listen(config.port, HOST);
-  new Logger('Bootstrap').log(`API listening on http://${HOST}:${config.port}/${API_PREFIX}`);
+  await app.listen(config.port, config.host);
+  new Logger('Bootstrap').log(
+    `API listening on http://${config.host}:${config.port}/${API_PREFIX}`,
+  );
 }
 
 bootstrap().catch((error: unknown) => {

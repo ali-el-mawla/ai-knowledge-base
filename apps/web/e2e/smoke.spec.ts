@@ -19,7 +19,8 @@ test('a new user adds a document, asks the chat about it and opens the cited pas
   const email = `e2e-${randomUUID()}@example.test`;
   const password = `pw-${randomUUID()}`;
   const answer = page.getByRole('article', { name: 'Answer' });
-  const sourcePanel = page.getByRole('complementary', { name: TITLE });
+  // The docked source panel is a section labelled by its heading ("1 Zephyr project brief").
+  const sourcePanel = page.getByRole('region', { name: TITLE });
 
   await test.step('sign up', async () => {
     await page.goto('/signup');

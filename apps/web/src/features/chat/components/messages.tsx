@@ -1,9 +1,10 @@
 'use client';
 
-import type { MessageStatus, Source } from '@repo/shared';
+import type { MessageStatus, Source, TokenUsage } from '@repo/shared';
 import { Loader2Icon, SearchIcon } from 'lucide-react';
 import { memo, useCallback, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
+import { formatNumber } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { AnswerMarkdown } from './answer-markdown';
 import { CopyButton } from './copy-button';
@@ -50,6 +51,16 @@ interface AssistantMessageProps {
   /** The citation number whose source is open in the panel, if it belongs to this message. */
   activeIndex: number | null;
   onOpenSource: OpenMessageSource;
+  /** Stored with a saved answer; shown under a complete one. */
+  usage?: TokenUsage | null;
+  /** "provider/model" that wrote a saved answer. */
+  model?: string | null;
+}
+
+/** "anthropic/claude-sonnet-5 · 1,234 in / 210 out tokens". */
+function UsageLine({ model, usage }: { model: string; usage: TokenUsage }) {
+  const tokens = `${formatNumber(usage.promptTokens)} in / ${formatNumber(usage.completionTokens)} out tokens`;
+  return <p className="text-xs text-muted-foreground tabular-nums">{`${model} · ${tokens}`}</p>;
 }
 
 /** Memoised: while a new answer streams, the earlier ones do not re-render. */
@@ -62,6 +73,8 @@ export const AssistantMessage = memo(function AssistantMessage({
   rewrittenQuery,
   activeIndex,
   onOpenSource,
+  usage = null,
+  model = null,
 }: AssistantMessageProps) {
   const live = status === 'searching' || status === 'writing';
 
@@ -130,6 +143,7 @@ export const AssistantMessage = memo(function AssistantMessage({
           {!live && content && <CopyButton text={content} label="Copy answer" />}
         </div>
       )}
+      {status === 'complete' && usage && model && <UsageLine model={model} usage={usage} />}
     </article>
   );
 });

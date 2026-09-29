@@ -45,7 +45,7 @@ export interface RewritePromptInput {
 /**
  * Messages for the answer: the rules as the system message, then the recent conversation,
  * then one user message with the sources first and the question last, as long-context
- * guidance (Anthropic's included) recommends.
+ * guidance (Anthropic's included) recommends. User and assistant turns alternate.
  */
 export function buildAnswerMessages({
   question,
@@ -54,8 +54,10 @@ export function buildAnswerMessages({
 }: AnswerPromptInput): PromptMessage[] {
   return [
     { role: 'system', content: ANSWER_SYSTEM_PROMPT },
-    ...recentTurns(history, PROMPT_LIMITS.answer),
-    { role: 'user', content: `${formatSources(sources)}\n\nQuestion: ${question.trim()}` },
+    ...mergeSameRoleTurns([
+      ...recentTurns(history, PROMPT_LIMITS.answer),
+      { role: 'user', content: `${formatSources(sources)}\n\nQuestion: ${question.trim()}` },
+    ]),
   ];
 }
 
@@ -95,6 +97,25 @@ function recentTurns(history: readonly HistoryTurn[], limits: TurnLimits): Promp
     role: turn.role,
     content: truncateText(turn.content, limits.charsPerTurn),
   }));
+}
+
+/**
+ * Joins consecutive turns of the same role with a blank line. A question whose answer was
+ * stopped or failed has no assistant turn after it (partial answers are not history), so
+ * two user turns can meet, and strict OpenAI-compatible servers reject roles that do not
+ * alternate.
+ */
+function mergeSameRoleTurns(turns: readonly PromptMessage[]): PromptMessage[] {
+  const merged: PromptMessage[] = [];
+  for (const turn of turns) {
+    const previous = merged.at(-1);
+    if (previous?.role === turn.role) {
+      previous.content = `${previous.content}\n\n${turn.content}`;
+    } else {
+      merged.push({ ...turn });
+    }
+  }
+  return merged;
 }
 
 function formatSources(sources: readonly PromptSource[]): string {

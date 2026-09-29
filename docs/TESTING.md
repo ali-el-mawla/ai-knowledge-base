@@ -17,7 +17,7 @@ Four suites, fastest first. All use Vitest except the end-to-end smoke test, whi
 - `packages/ai`: configuration and provider presets, and the OpenAI-compatible chat and embedding clients against a fake `fetch` (streaming, usage, normalised errors).
 - `packages/shared`: the chat stream (SSE) encoder and parser.
 - `apps/api` (`src/**/*.test.ts`): config validation, the auth guard, the error filter and validation pipes, the chat service, the ingestion service and worker, retrieval and the row mappers. Collaborators are replaced with test doubles.
-- `apps/web` (`src/**/*.test.{ts,tsx}`, jsdom): the chat stream state and hook, citation chips in answers, the composer, document form validation, the status badge and the API client.
+- `apps/web` (`src/**/*.test.{ts,tsx}`, jsdom): the chat stream state and hook, citation chips and the usage line in answers, the composer, document form validation, the status badge and the API client.
 - `apps/eval`: answer-span matching, the metrics (hit@k, MRR) and the question file validation.
 
 ## API integration tests

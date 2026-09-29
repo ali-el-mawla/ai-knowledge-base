@@ -8,10 +8,10 @@ Features:
 
 - Sign-up and sign-in. Every document and conversation is private to its owner, enforced by the database.
 - A Markdown editor with tags and preview. A badge shows Queued, Indexing, Ready or Failed (with the reason), and a Chunks tab shows how the document was split.
-- Text search, tag filter and paging, kept in the URL.
+- A text filter over titles and content, a tag filter and paging, kept in the URL.
 - Streaming chat with history and `[n]` citations. When the documents do not cover a question, the answer says so. Follow-ups ("and is it paid?") are rewritten into a standalone search, shown as "Searched for: ...".
 - A citation opens the passage as it was when the answer was written, with its section, its semantic and keyword ranks, and a link to the document.
-- Stop mid-answer (the partial text is kept), retry (with a countdown when rate limited), rename and delete conversations. The chat header shows the active models.
+- Stop mid-answer (the partial text is kept), retry (with a countdown when rate limited), rename and delete conversations. The chat header shows the active models, and each answer shows its model and token usage.
 
 ## Loom walkthrough
 
@@ -44,6 +44,8 @@ TODO: Loom link
 | [Ollama](https://ollama.com/download), running            | Local embeddings. Setup pulls `nomic-embed-text` (about 270 MB) if it is missing.                                                 |
 | An Anthropic API key                                      | For the chat, or any provider from [the table](#swapping-ai-providers). Without a key, documents and search work and chat is off. |
 
+No Ollama? Before `npm run setup`, copy `.env.example` to `.env` and switch it to the [OpenAI embedding settings](#embedding-settings).
+
 ### Run it
 
 ```bash
@@ -65,6 +67,8 @@ npm run dev
 | http://127.0.0.1:54323           | Supabase Studio (browse tables, users, policies)      |
 | http://127.0.0.1:54324           | Local mail inbox (Mailpit)                            |
 
+If another local Supabase project is running on the same ports, stop it first (`npx supabase stop --project-id <other>`), or `supabase start` fails with "port is already allocated".
+
 **Demo login:** `demo@quaylark.test` / `demo-password-2026`, with 8 documents of a fictional company (about 9,700 words, 127 chunks) seeded by setup. You can also sign up with any email; the local stack skips email confirmation.
 
 [`.env.example`](.env.example) documents every variable. One `.env` at the root serves both apps.
@@ -75,8 +79,8 @@ npm run dev
 
 1. Checks Node (22.12 or newer) and runs `npm install`.
 2. Creates `.env` from `.env.example` if there is none.
-3. Checks Docker, starts local Supabase (CLI pinned as a devDependency), fills the empty Supabase variables from `supabase status` without overwriting yours, and applies the migrations.
-4. With `EMBEDDING_PROVIDER=ollama`, checks that Ollama answers and pulls the embedding model if it is missing.
+3. With `EMBEDDING_PROVIDER=ollama`, checks that Ollama answers and pulls the embedding model if it is missing, so a missing Ollama stops setup before the slow Supabase start.
+4. Checks Docker, starts local Supabase (CLI pinned as a devDependency), fills the empty Supabase variables from `supabase status` without overwriting yours, and applies the migrations.
 5. Builds the API and its packages, seeds the demo account through the real ingestion pipeline, and warns if the chat key is missing.
 
 ### Commands
@@ -158,6 +162,8 @@ flowchart LR
 
 The browser uses Supabase for authentication only. All data goes through the API with the user's access token, and the API reaches Postgres through PostgREST with that same token, so Row Level Security applies to every user request. Request flows, the data model and the SSE protocol are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
+There are two kinds of search. The search box on the documents page is a deliberate substring filter over titles and content (`GET /api/documents?q=`), for finding a document by name or a phrase you remember. `POST /api/search` is the retrieval the chat uses (hybrid by default, or one arm alone); it is exposed for debugging and evaluation and has no dedicated UI. See [docs/API.md](docs/API.md#two-kinds-of-search).
+
 ### Repository layout
 
 | Path                                 | What it is                                                                                  |
@@ -209,7 +215,7 @@ A workflow: the steps are fixed (rewrite if needed, retrieve, answer, validate) 
 
 ### Local-first and cost control
 
-Supabase and embeddings run locally (documents never leave the machine) and the tests use fake models, so only chat answers cost money. Output is capped at 1,024 tokens per answer and 120 per rewrite, only follow-ups are rewritten (by `claude-haiku-4-5` in `.env.example`), and every answer stores its token usage. [ADR 0008](docs/adr/0008-local-first-and-cost-control.md)
+Supabase and embeddings run locally (documents never leave the machine) and the tests use fake models, so only chat answers cost money. Output is capped at 1,024 tokens per answer and 120 per rewrite, only follow-ups are rewritten (by the smaller `claude-haiku-4-5` with `REWRITE_MODEL` set as in [Chat settings](#chat-settings)), and every answer stores its token usage. [ADR 0008](docs/adr/0008-local-first-and-cost-control.md)
 
 ## Swapping AI providers
 
@@ -223,7 +229,7 @@ Chat (`CHAT_*`, optional `REWRITE_MODEL`) and embeddings (`EMBEDDING_*`) are ind
 | `ollama`                             | verified    | verified (default)        |
 | `openai`                             | config only | config only               |
 | `groq`                               | config only | none offered              |
-| `together`                           | config only | preset exists, not tested |
+| `together`                           | config only | no serverless models      |
 | `openrouter`                         | config only | preset exists, not tested |
 | `custom` (any OpenAI-compatible URL) | config only | config only               |
 
@@ -269,7 +275,7 @@ CHAT_BASE_URL=http://127.0.0.1:8000/v1
 CHAT_MODEL=<model name>
 ```
 
-`REWRITE_MODEL` is optional (a smaller model of the same provider; it defaults to `CHAT_MODEL`). `CHAT_TEMPERATURE` (0 to 2) is optional too and sent only when set, because newer models such as `claude-sonnet-5` and OpenAI's reasoning models reject the parameter.
+`REWRITE_MODEL` is optional and defaults to `CHAT_MODEL`. It runs on the chat provider, so it must name a model of that provider: `claude-haiku-4-5` with Anthropic, as above; with any other provider, leave it empty or set a smaller model of that provider. `CHAT_TEMPERATURE` (0 to 2) is optional too and sent only when set, because newer models such as `claude-sonnet-5` and OpenAI's reasoning models reject the parameter.
 
 ### Embedding settings
 
@@ -320,7 +326,7 @@ Per-type and per-question results and the misses are in [docs/EVAL.md](docs/EVAL
 
 | Suite                | Command                    | Tests                                                    | Needs                                  |
 | -------------------- | -------------------------- | -------------------------------------------------------- | -------------------------------------- |
-| Unit                 | `npm test`                 | 554: api 195, web 128, rag 111, ai 88, eval 28, shared 4 | nothing                                |
+| Unit                 | `npm test`                 | 563: api 198, web 133, rag 112, ai 88, eval 28, shared 4 | nothing                                |
 | API integration      | `npm run test:integration` | 87, plus 1 live-provider test skipped unless `LIVE_AI=1` | local Supabase                         |
 | End-to-end smoke     | `npm run test:e2e`         | 1 Playwright journey                                     | the whole stack and a chat key         |
 | Retrieval evaluation | `npm run eval`             | see [Evaluation](#evaluation)                            | local Supabase and the embedding model |

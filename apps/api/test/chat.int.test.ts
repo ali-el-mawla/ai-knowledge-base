@@ -401,7 +401,7 @@ describe.skipIf(LIVE)('with fake models', () => {
       }
     });
 
-    it('answers 503 JSON before any stream when embeddings are down', async () => {
+    it('answers 503 JSON before any stream when embeddings are down, saving nothing', async () => {
       const other = await createConversation(asAlice);
       embedding.error = new AiProviderError('unavailable', 'ollama is down', 'ollama');
       try {
@@ -411,6 +411,19 @@ describe.skipIf(LIVE)('with fake models', () => {
       } finally {
         embedding.error = null;
       }
+      const refused = await asAlice.get<ConversationWithMessages>(`/conversations/${other.id}`);
+      expect(refused.body.messages).toEqual([]);
+      expect(refused.body.conversation.title).toBe('New conversation');
+
+      // Retrying once embeddings are back saves the question once, not twice.
+      chat.script = { deltas: ['Yes [1].'] };
+      const retry = await sendMessage(app.baseUrl, alice.token, other.id, QUESTION);
+      expect(retry.status).toBe(200);
+      const saved = await asAlice.get<ConversationWithMessages>(`/conversations/${other.id}`);
+      expect(saved.body.messages.map(({ role, content }) => [role, content])).toEqual([
+        ['user', QUESTION],
+        ['assistant', 'Yes [1].'],
+      ]);
     });
   });
 
@@ -493,9 +506,15 @@ describe.skipIf(LIVE)('with fake models', () => {
 
       await sendMessage(app.baseUrl, alice.token, conversation.id, 'Q5');
 
-      // Last 6 finished: A1 Q2 A2 Q3 Q4 A4; the prompt then starts at a user turn.
+      // Last 6 finished: A1 Q2 A2 Q3 Q4 A4; the prompt then starts at a user turn, and Q3
+      // (its answer was stopped) is joined with Q4, so the roles alternate.
       const history = chat.lastMessages().slice(1, -1);
-      expect(history.map((message) => message.content)).toEqual(['Q2', 'A2', 'Q3', 'Q4', 'A4']);
+      expect(history.map(({ role, content }) => [role, content])).toEqual([
+        ['user', 'Q2'],
+        ['assistant', 'A2'],
+        ['user', 'Q3\n\nQ4'],
+        ['assistant', 'A4'],
+      ]);
     });
 
     it('limits each user to 20 messages a minute, checked before anything else (429)', async () => {

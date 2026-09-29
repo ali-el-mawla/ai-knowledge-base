@@ -4,6 +4,8 @@ import { z } from 'zod';
 /** Validated, typed configuration. Built once at startup and injected with `@InjectConfig()`. */
 export interface AppConfig {
   port: number;
+  /** Interface the API listens on: 127.0.0.1 by default, 0.0.0.0 in a container. */
+  host: string;
   /** Origin of the web app, allowed by CORS. */
   webOrigin: string;
   supabase: {
@@ -59,6 +61,7 @@ const envSchema = z.object({
       .max(65535, 'must be a port number')
       .default(4000),
   ),
+  API_HOST: z.preprocess(blankAsUndefined, z.string().trim().default('127.0.0.1')),
   WEB_ORIGIN: z.preprocess(blankAsUndefined, httpUrl.default('http://127.0.0.1:3000')),
 });
 
@@ -86,6 +89,7 @@ export function loadAppConfig(env: Env): AppConfig {
   const supabaseUrl = parsed.data.SUPABASE_URL.replace(/\/+$/, '');
   return {
     port: parsed.data.API_PORT,
+    host: parsed.data.API_HOST,
     webOrigin: new URL(parsed.data.WEB_ORIGIN).origin,
     supabase: {
       url: supabaseUrl,

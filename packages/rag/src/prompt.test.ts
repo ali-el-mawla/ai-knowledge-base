@@ -111,14 +111,18 @@ describe('buildAnswerMessages', () => {
         history: alternatingHistory(9),
       });
       expect(messages[1]).toEqual({ role: 'user', content: 'Turn 5' });
-      expect(messages).toHaveLength(1 + 5 + 1);
+      // Turns 5 to 8, then the unanswered Turn 9 joined with the question.
+      expect(messages).toHaveLength(1 + 4 + 1);
     });
 
     it(`caps each turn at ${PROMPT_LIMITS.answer.charsPerTurn} characters`, () => {
       const messages = buildAnswerMessages({
         question: 'Next?',
         sources,
-        history: [{ role: 'user', content: 'word '.repeat(1_000) }],
+        history: [
+          { role: 'user', content: 'word '.repeat(1_000) },
+          { role: 'assistant', content: 'Short answer.' },
+        ],
       });
       const turn = messages[1]?.content ?? '';
       expect(turn.length).toBeLessThanOrEqual(PROMPT_LIMITS.answer.charsPerTurn);
@@ -149,7 +153,29 @@ describe('buildAnswerMessages', () => {
           { role: 'assistant', content: '   ' },
         ],
       });
-      expect(messages.map((m) => m.role)).toEqual(['system', 'user', 'user']);
+      // The unanswered question is joined with the new one, so roles still alternate.
+      expect(messages.map((m) => m.role)).toEqual(['system', 'user']);
+      expect(lastMessage(messages).startsWith('First question\n\n<sources>')).toBe(true);
+    });
+
+    it('joins consecutive turns of one role, so user and assistant alternate', () => {
+      // Q1 and Q3 lost their answers (stopped or failed), which history leaves out.
+      const messages = buildAnswerMessages({
+        question: 'Q4?',
+        sources: [],
+        history: [
+          { role: 'user', content: 'Q1' },
+          { role: 'user', content: 'Q2' },
+          { role: 'assistant', content: 'A2' },
+          { role: 'user', content: 'Q3' },
+        ],
+      });
+      expect(messages).toEqual([
+        { role: 'system', content: ANSWER_SYSTEM_PROMPT },
+        { role: 'user', content: 'Q1\n\nQ2' },
+        { role: 'assistant', content: 'A2' },
+        { role: 'user', content: 'Q3\n\n<sources>\n</sources>\n\nQuestion: Q4?' },
+      ]);
     });
   });
 

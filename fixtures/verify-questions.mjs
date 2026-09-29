@@ -24,7 +24,6 @@ const TYPES = [
   'paraphrase',
 ];
 const FIELDS = ['id', 'question', 'document', 'answer', 'type'];
-const EM_DASH = String.fromCharCode(0x2014);
 
 function resolveQuestionsFile() {
   const arg = process.argv[2];
@@ -114,10 +113,6 @@ questions.forEach((entry, index) => {
 
   if (!TYPES.includes(type)) {
     errors.push(`${label}: unknown type "${type}" (allowed: ${TYPES.join(', ')})`);
-  }
-
-  for (const field of FIELDS) {
-    if (entry[field].includes(EM_DASH)) errors.push(`${label}: "${field}" contains an em dash`);
   }
 
   const text = docs.get(document);

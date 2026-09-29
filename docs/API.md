@@ -26,9 +26,14 @@ Errors are always `{ "error": { "code", "message", "details"?, "requestId" } }`,
 | DELETE | `/conversations/:id`          |                                                       | `204`                                                                   |
 | POST   | `/conversations/:id/messages` | `{ content }`                                         | `text/event-stream` of `ChatStreamEvent`                                |
 
+## Two kinds of search
+
+- `GET /documents?q=` is a deliberate substring filter: a case-insensitive match over titles and content, for finding a document by name or a phrase you remember. The search box on the documents page uses it.
+- `POST /search` is the retrieval the chat uses, over the embedded chunks: with the defaults (`hybrid`, 6 results) it returns exactly the sources the chat would give the model for that query, and `vector` or `keyword` run one arm alone. It is exposed for debugging and evaluation and has no dedicated UI.
+
 ## Chat stream
 
-`POST /conversations/:id/messages` validates the request and checks ownership and the rate limit before streaming, so those failures are normal JSON errors. After the headers, the stream is:
+`POST /conversations/:id/messages` validates the request and checks ownership and the rate limit before streaming, so those failures are normal JSON errors. The question is saved only after retrieval succeeded, right before the stream opens, so a JSON error leaves nothing saved. After the headers, the stream is:
 
 ```
 event: start   data: { conversationId, userMessage, rewrittenQuery, sources }

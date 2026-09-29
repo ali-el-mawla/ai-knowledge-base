@@ -38,7 +38,6 @@ export interface Validation {
 
 const FIELDS = ['id', 'question', 'document', 'answer', 'type'] as const;
 type Field = (typeof FIELDS)[number];
-const EM_DASH = String.fromCharCode(0x2014);
 
 /** fixtures/questions.json when it exists, otherwise the template. Throws on any error. */
 export function loadQuestions(
@@ -94,9 +93,6 @@ export function validateQuestions(raw: unknown, corpus: readonly CorpusDocument[
     seenIds.add(id);
     if (!isQuestionType(type)) {
       errors.push(`${id}: unknown type "${type}" (allowed: ${QUESTION_TYPES.join(', ')})`);
-    }
-    for (const field of FIELDS) {
-      if (fields[field].includes(EM_DASH)) errors.push(`${id}: "${field}" contains an em dash`);
     }
 
     const text = texts.get(document);

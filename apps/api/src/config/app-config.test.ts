@@ -24,6 +24,7 @@ describe('loadAppConfig', () => {
   it('applies defaults and derives the auth endpoints', () => {
     const config = loadAppConfig(validEnv);
     expect(config.port).toBe(4000);
+    expect(config.host).toBe('127.0.0.1');
     expect(config.webOrigin).toBe('http://127.0.0.1:3000');
     expect(config.supabase).toEqual({
       url: 'http://127.0.0.1:54321',
@@ -40,10 +41,16 @@ describe('loadAppConfig', () => {
     const config = loadAppConfig({
       ...validEnv,
       API_PORT: '',
+      API_HOST: '  ',
       WEB_ORIGIN: 'http://localhost:3000/',
     });
     expect(config.port).toBe(4000);
+    expect(config.host).toBe('127.0.0.1');
     expect(config.webOrigin).toBe('http://localhost:3000');
+  });
+
+  it('listens on API_HOST when set, for example in a container', () => {
+    expect(loadAppConfig({ ...validEnv, API_HOST: '0.0.0.0' }).host).toBe('0.0.0.0');
   });
 
   it('lists every invalid variable at once', () => {

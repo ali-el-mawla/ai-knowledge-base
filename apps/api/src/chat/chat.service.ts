@@ -68,8 +68,8 @@ interface Generation {
 }
 
 /**
- * One chat turn, end to end: save the question, rewrite a follow-up into a standalone
- * query, retrieve sources, stream the answer, save it with its validated citations.
+ * One chat turn, end to end: rewrite a follow-up into a standalone query, retrieve
+ * sources, save the question, stream the answer, save it with its validated citations.
  */
 @Injectable()
 export class ChatService {
@@ -86,8 +86,8 @@ export class ChatService {
   /**
    * Error contract: everything that can fail before `sink.open()` (chat not configured,
    * unknown conversation, database or embedding failures) is thrown and becomes a normal
-   * JSON error. Once the sink is open this never throws: a failure is sent as an `error`
-   * event and the stream ends. `signal` fires when the client disconnects.
+   * JSON error, with nothing saved. Once the sink is open this never throws: a failure is
+   * sent as an `error` event and the stream ends. `signal` fires when the client disconnects.
    */
   async reply(request: ChatTurnRequest, sink: ChatEventSink, signal: AbortSignal): Promise<void> {
     const chat = this.chatModel;
@@ -97,16 +97,12 @@ export class ChatService {
     const { user, conversationId, question } = request;
 
     const conversation = await this.conversations.getOwned(user, conversationId);
-    // Read before the new question is saved, so the history holds only the earlier turns.
+    // Read before the new question is saved (below), so the history holds only the earlier turns.
     const history = await this.conversations.recentHistory(
       user,
       conversationId,
       CHAT_SETTINGS.historyMessages,
     );
-    const userMessage = await this.conversations.addUserMessage(user, conversationId, question);
-    if (conversation.title === DEFAULT_CONVERSATION_TITLE) {
-      await this.nameConversation(request);
-    }
 
     // A first question is already standalone; only follow-ups ("and for part-timers?")
     // need the conversation folded in before they can be searched.
@@ -126,6 +122,13 @@ export class ChatService {
       throw error;
     }
     if (signal.aborted) return;
+
+    // Saved only now, right before the stream opens: a turn refused earlier (a 503 while
+    // embeddings are down) leaves no question behind for a retry to duplicate.
+    const userMessage = await this.conversations.addUserMessage(user, conversationId, question);
+    if (conversation.title === DEFAULT_CONVERSATION_TITLE) {
+      await this.nameConversation(request);
+    }
 
     sink.open();
     sink.send({ type: 'start', conversationId, userMessage, rewrittenQuery, sources });
