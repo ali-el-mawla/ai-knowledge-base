@@ -288,8 +288,10 @@ function limitations(input: ReportInput): string {
     '',
     `The sample is small: ${n} question${n === 1 ? '' : 's'}, so one question moves a hit rate by about ${step} percentage points, ` +
       'and a gap of a few questions between two rows can be noise. ' +
-      'The questions were written by one person who had read the documents, which tends to reuse the wording of the documents ' +
-      'and so favours keyword search; real users phrase things less predictably. ' +
+      `The ${n} questions were generated with Claude (an LLM) from the corpus, deliberately paraphrased away from the ` +
+      'wording of the documents, and every answer span was verified verbatim by `fixtures/verify-questions.mjs`. ' +
+      'LLM-generated questions can still share vocabulary with the source and so flatter semantic search, and they come ' +
+      'from a single generator; real users phrase things less predictably. ' +
       'A hit is decided by answer-span matching: a chunk that gives the answer in other words, or a span cut in two by a chunk boundary, ' +
       'counts as a miss, and a chunk that happens to contain the span counts as a hit even if it is not the best passage. ' +
       'Keyword scores often tie (several chunks share the top score, usually through a title or heading match); ' +

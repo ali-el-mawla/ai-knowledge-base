@@ -363,11 +363,20 @@ EMBEDDING_QUERY_PREFIX=
 
 `npm run eval` ([`apps/eval`](apps/eval)) measures retrieval, not generation. Each question names the document that answers it and a short answer span copied word for word from it. The corpus is indexed twice, with the structure-aware chunker and a naive fixed-size baseline (each under its own user, so RLS keeps them apart), and every question runs through the same `hybrid_search` in vector, keyword and hybrid mode. A hit is a retrieved chunk from the right document that contains the span; the report gives hit@1, hit@3, hit@5 and MRR@10 per combination. It makes no chat calls, so it costs nothing to rerun.
 
-<!-- EVAL:TABLE -->
+The 40 questions in [`fixtures/questions.json`](fixtures/questions.json) (5 per document, six question types) were generated with Claude (an LLM) from the corpus, deliberately paraphrased away from the document wording, and every answer span is checked verbatim by `fixtures/verify-questions.mjs`. LLM-generated questions can still share vocabulary with the source and flatter semantic search, and they come from a single generator.
 
-TODO: paste the results table from [docs/EVAL.md](docs/EVAL.md) here after the 30-question run.
+| Chunking         | Retrieval | hit@1       | hit@3       | hit@5       | MRR@10 |
+| ---------------- | --------- | ----------- | ----------- | ----------- | ------ |
+| Structure-aware  | vector    | 27/40 (68%) | 34/40 (85%) | 35/40 (88%) | 0.758  |
+| Structure-aware  | keyword   | 22/40 (55%) | 30/40 (75%) | 31/40 (78%) | 0.665  |
+| Structure-aware  | hybrid    | 26/40 (65%) | 36/40 (90%) | 38/40 (95%) | 0.770  |
+| Naive fixed-size | vector    | 19/40 (48%) | 32/40 (80%) | 35/40 (88%) | 0.645  |
+| Naive fixed-size | keyword   | 17/40 (43%) | 25/40 (63%) | 27/40 (68%) | 0.555  |
+| Naive fixed-size | hybrid    | 19/40 (48%) | 32/40 (80%) | 37/40 (93%) | 0.633  |
 
-The full report, with per-question ranks, misses and limitations, is [docs/EVAL.md](docs/EVAL.md).
+Structure-aware chunking wins mostly at the top of the list: with hybrid it puts the answer first for 26 of 40 questions against 19 for the naive baseline (MRR 0.770 against 0.633), while hit@5 is close (38 against 37). Hybrid is the best mode on this set by hit@5 and MRR, but only modestly ahead of vector-only (38/40 against 35/40 at hit@5, and one question behind at hit@1), and keyword alone is last in both strategies. On structure-aware chunks the fusion cuts both ways on exact codes: it rescues the SEV3 question that vector search misses entirely (rank 3 instead of outside the top 10), but it buries the EXP-TRV-06 question that keyword search ranks first, because with equal weights a chunk found by only one arm scores at most 1/61 while any chunk found by both arms scores at least 2/90.
+
+The full report, with hit@5 per question type, per-question ranks, misses and limitations, is [docs/EVAL.md](docs/EVAL.md).
 
 ## Testing and CI
 
@@ -389,7 +398,7 @@ Details: [docs/TESTING.md](docs/TESTING.md).
 In priority order:
 
 1. **A durable job queue.** Replace the in-process queue with pgmq or pg-boss in the same Postgres: retries with backoff, a dead-letter state, several workers, and ingestion moved out of the API process so it scales on its own. The database is already the source of truth (statuses and versions), so the worker contract stays the same.
-2. **A reranker, if the evaluation asks for it.** If the 30-question set shows right answers sitting at ranks 2 to 10, rerank the fused top 20 to 30 with a cross-encoder before taking 6. Measure first; do not add it on faith.
+2. **A reranker or weighted fusion, measured with this harness.** With hybrid on structure-aware chunks, 12 of the 40 answers sit at ranks 2 to 5 (hit@1 26/40, hit@5 38/40), and equal-weight RRF can push a keyword-only first hit out of the top 10 (the EXP-TRV-06 question). Rerank the fused top 20 to 30 with a cross-encoder before taking 6, or weight the arms, and keep the change only if `npm run eval` shows it helps.
 3. **A native Anthropic adapter, then LLM contextual retrieval.** A native `ChatModel` unlocks prompt caching. With caching, an LLM can write a short context line for every chunk (the full version of today's title and heading header) at a fraction of the cost.
 4. **Observability.** Trace each chat turn by step (rewrite, embed, search, generate) with timings and token counts, and build a cost view per user and model from the usage already stored on every assistant message.
 5. **Scaling.** A shared store (Redis) for rate limits, which live in each API process today; per-plan limits; connection pooling in front of Postgres and read replicas for search; caching query embeddings for repeated questions; tuning HNSW (`ef_search`, `m`) against the evaluation as the corpus grows.
@@ -408,5 +417,5 @@ In priority order:
 - Small local chat models may ignore the citation format.
 - `npm run reembed` detects a changed embedding model by name. Changing only the prefixes changes the chunk hashes, so the next edit or a Reindex re-embeds that document, but `reembed` does not pick it up by itself. Changing the dimension needs a migration.
 - The conversation sidebar shows the 200 most recent conversations, without paging.
-- The evaluation set is small and written by one person, and it measures retrieval, not answer quality.
+- The evaluation set is small (40 questions) and was generated with Claude from the corpus, so it can share vocabulary with the documents; it measures retrieval, not answer quality.
 - A dropped connection ends the answer: the partial text is saved as stopped and the user retries.

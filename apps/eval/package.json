@@ -2,7 +2,7 @@
   "name": "@repo/eval",
   "version": "0.0.0",
   "private": true,
-  "description": "Retrieval evaluation: chunking strategies x retrieval modes, hit@k and MRR on a hand-written question set.",
+  "description": "Retrieval evaluation: chunking strategies x retrieval modes, hit@k and MRR on an LLM-generated, verbatim-checked question set.",
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

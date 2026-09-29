@@ -1,0 +1,282 @@
+[
+  {
+    "id": "q01",
+    "question": "I used my own vehicle to drive to a customer site. What does Quaylark reimburse under EXP-TRV-06?",
+    "document": "travel-and-expense-policy.md",
+    "answer": "0.41 USD per kilometre",
+    "type": "exact-code"
+  },
+  {
+    "id": "q02",
+    "question": "What is the most I can expense for one night in a hotel when I am visiting Toronto for work?",
+    "document": "travel-and-expense-policy.md",
+    "answer": "230 USD",
+    "type": "table"
+  },
+  {
+    "id": "q03",
+    "question": "When I take a customer out for a meal, how much am I allowed to spend on each guest?",
+    "document": "travel-and-expense-policy.md",
+    "answer": "120 USD per attendee, including tax and tip",
+    "type": "nested-heading"
+  },
+  {
+    "id": "q04",
+    "question": "Finance turned down one of my claims and talking to the approver did not help. Where does it go next, and is there a deadline?",
+    "document": "travel-and-expense-policy.md",
+    "answer": "escalate to the Finance Controller within 10 working days",
+    "type": "ambiguous-term"
+  },
+  {
+    "id": "q05",
+    "question": "I am going to a conference overseas. How far ahead do I need sign-off from my manager and VP?",
+    "document": "travel-and-expense-policy.md",
+    "answer": "at least 14 days before departure",
+    "type": "paraphrase"
+  },
+  {
+    "id": "q06",
+    "question": "What is the monthly cost per warehouse on PLN-SCALE-24?",
+    "document": "pricing-and-plans.md",
+    "answer": "1,190 USD",
+    "type": "exact-code"
+  },
+  {
+    "id": "q07",
+    "question": "A charity is asking for our discount for non-profit organisations. What do they need to give us to qualify?",
+    "document": "pricing-and-plans.md",
+    "answer": "Proof of status required",
+    "type": "table"
+  },
+  {
+    "id": "q08",
+    "question": "How big a price cut can an account exec agree to without getting anyone else to sign off?",
+    "document": "pricing-and-plans.md",
+    "answer": "can give a total discount of up to 10% on their own",
+    "type": "nested-heading"
+  },
+  {
+    "id": "q09",
+    "question": "A customer is about to cancel. What retention offer can we make to keep them?",
+    "document": "pricing-and-plans.md",
+    "answer": "a one-time retention credit of up to 2 months of fees",
+    "type": "ambiguous-term"
+  },
+  {
+    "id": "q10",
+    "question": "What is the markup if a customer wants to pay month by month instead of signing for a year?",
+    "document": "pricing-and-plans.md",
+    "answer": "at 20% above the list price",
+    "type": "paraphrase"
+  },
+  {
+    "id": "q11",
+    "question": "What is form HR-WFA-02 for, and how early does it have to be handed in?",
+    "document": "employee-handbook.md",
+    "answer": "at least 15 working days before you travel",
+    "type": "exact-code"
+  },
+  {
+    "id": "q12",
+    "question": "How much time off do I get if my mother or brother dies?",
+    "document": "employee-handbook.md",
+    "answer": "5 working days for immediate family",
+    "type": "table"
+  },
+  {
+    "id": "q13",
+    "question": "I brought a problem at work to my manager two weeks ago and it is still not sorted. What is the next step for escalation?",
+    "document": "employee-handbook.md",
+    "answer": "escalate it to your People Partner",
+    "type": "ambiguous-term"
+  },
+  {
+    "id": "q14",
+    "question": "How many hours a week is a full-time job in the Dutch office?",
+    "document": "employee-handbook.md",
+    "answer": "38 hours in Rotterdam",
+    "type": "nested-heading"
+  },
+  {
+    "id": "q15",
+    "question": "How long do I have to work here before I can take a month off with pay to recharge?",
+    "document": "employee-handbook.md",
+    "answer": "After 5 years of continuous service",
+    "type": "paraphrase"
+  },
+  {
+    "id": "q16",
+    "question": "During a SEV3, how often should we post progress to stakeholders?",
+    "document": "security-incident-response-runbook.md",
+    "answer": "Every 4 hours",
+    "type": "exact-code"
+  },
+  {
+    "id": "q17",
+    "question": "How long do we keep the memory and disk captures taken from a hacked server?",
+    "document": "security-incident-response-runbook.md",
+    "answer": "Evidence snapshot retention is 400 days",
+    "type": "code-block"
+  },
+  {
+    "id": "q18",
+    "question": "Once an incident is closed, how long does its Slack room stay around before it is shut down?",
+    "document": "security-incident-response-runbook.md",
+    "answer": "Incident channels are archived 30 days after the incident is resolved",
+    "type": "code-block"
+  },
+  {
+    "id": "q19",
+    "question": "At what point does an outage have to be escalated to the vice president of engineering?",
+    "document": "security-incident-response-runbook.md",
+    "answer": "SEV1 declared, or a SEV2 open for more than 4 hours",
+    "type": "ambiguous-term"
+  },
+  {
+    "id": "q20",
+    "question": "If the main on-call person does not respond to a page, how long before the backup gets paged?",
+    "document": "security-incident-response-runbook.md",
+    "answer": "Primary has not acknowledged within 10 minutes",
+    "type": "table"
+  },
+  {
+    "id": "q21",
+    "question": "What is the largest request payload the API will accept?",
+    "document": "product-api-specification.md",
+    "answer": "Maximum body size: 1 MB",
+    "type": "nested-heading"
+  },
+  {
+    "id": "q22",
+    "question": "How stale can a webhook delivery be before the sample verification code refuses it?",
+    "document": "product-api-specification.md",
+    "answer": "more than 300 seconds old (replay protection)",
+    "type": "code-block"
+  },
+  {
+    "id": "q23",
+    "question": "What API throughput does a PLN-ENT-24 workspace get out of the box?",
+    "document": "product-api-specification.md",
+    "answer": "3,000 by default, set by contract",
+    "type": "exact-code"
+  },
+  {
+    "id": "q24",
+    "question": "Our endpoint was down for a while. How many more attempts will Quaylark make to send each event?",
+    "document": "product-api-specification.md",
+    "answer": "retried up to 8 times with exponential backoff",
+    "type": "paraphrase"
+  },
+  {
+    "id": "q25",
+    "question": "Which API error means I tried to book a door that is already taken for that time slot?",
+    "document": "product-api-specification.md",
+    "answer": "The dock door already has an appointment in that window",
+    "type": "table"
+  },
+  {
+    "id": "q26",
+    "question": "Apart from quicker replies, what extras do customers get when they buy ADD-SUP-04?",
+    "document": "customer-support-sla.md",
+    "answer": "a designated support engineer and a quarterly support review",
+    "type": "exact-code"
+  },
+  {
+    "id": "q27",
+    "question": "What hours can a customer in Brazil reach a support agent on weekdays?",
+    "document": "customer-support-sla.md",
+    "answer": "07:00 to 20:00, Monday to Friday",
+    "type": "table"
+  },
+  {
+    "id": "q28",
+    "question": "A client with a critical ticket wants it escalated. How fast does a more senior person take it over?",
+    "document": "customer-support-sla.md",
+    "answer": "within 30 minutes of the escalation request",
+    "type": "ambiguous-term"
+  },
+  {
+    "id": "q29",
+    "question": "When a customer files a ticket at the most urgent support priority, what incident level does that trigger internally?",
+    "document": "customer-support-sla.md",
+    "answer": "automatically opens a SEV2 incident for Engineering",
+    "type": "ambiguous-term"
+  },
+  {
+    "id": "q30",
+    "question": "How long does a customer have to ask for money back after we miss the monthly availability promise?",
+    "document": "customer-support-sla.md",
+    "answer": "within 30 days after the end of the month",
+    "type": "paraphrase"
+  },
+  {
+    "id": "q31",
+    "question": "How big is the fake warehouse that the local seed script creates?",
+    "document": "engineering-onboarding-guide.md",
+    "answer": "with 12 dock doors and 3 carriers",
+    "type": "code-block"
+  },
+  {
+    "id": "q32",
+    "question": "Roughly how long does it take to run every test the way CI does?",
+    "document": "engineering-onboarding-guide.md",
+    "answer": "takes about 12 minutes",
+    "type": "code-block"
+  },
+  {
+    "id": "q33",
+    "question": "How much disk space does cloning the main repo need?",
+    "document": "engineering-onboarding-guide.md",
+    "answer": "about 1.8 GB with history",
+    "type": "code-block"
+  },
+  {
+    "id": "q34",
+    "question": "My database container will not start because something else already holds its port. How do I fix that?",
+    "document": "engineering-onboarding-guide.md",
+    "answer": "stop your local Postgres",
+    "type": "nested-heading"
+  },
+  {
+    "id": "q35",
+    "question": "How many sign-offs does a pull request touching the billing service need?",
+    "document": "engineering-onboarding-guide.md",
+    "answer": "2 approvals, and one of them must come from the owning team",
+    "type": "paraphrase"
+  },
+  {
+    "id": "q36",
+    "question": "How long do we keep truckers' mobile numbers that were used for text alerts?",
+    "document": "data-retention-and-privacy-policy.md",
+    "answer": "180 days after the driver's last appointment",
+    "type": "table"
+  },
+  {
+    "id": "q37",
+    "question": "What is the retention period for a former employee's payroll and contract files?",
+    "document": "data-retention-and-privacy-policy.md",
+    "answer": "6 years after employment ends",
+    "type": "ambiguous-term"
+  },
+  {
+    "id": "q38",
+    "question": "What format do the tracking numbers for DSARs use?",
+    "document": "data-retention-and-privacy-policy.md",
+    "answer": "DSAR-YYYY-NNNN, for example DSAR-2026-0147",
+    "type": "exact-code"
+  },
+  {
+    "id": "q39",
+    "question": "Someone who used to work here asks for a copy of their personal data. How long do we have to reply?",
+    "document": "data-retention-and-privacy-policy.md",
+    "answer": "Answer within 30 calendar days of receiving the request",
+    "type": "nested-heading"
+  },
+  {
+    "id": "q40",
+    "question": "How much warning do customers get before we bring in a new third party that will handle their data?",
+    "document": "data-retention-and-privacy-policy.md",
+    "answer": "30 days notice before a new sub-processor",
+    "type": "paraphrase"
+  }
+]

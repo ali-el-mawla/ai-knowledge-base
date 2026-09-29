@@ -8,19 +8,19 @@ Quaylark Systems, Inc. is an invented mid-size B2B SaaS company (about 430 emplo
 
 ## What is here
 
-| Path                                           | What it is                                                                                        |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `corpus/employee-handbook.md`                  | Working hours, leave (annual, sick, parental), remote work, employee retention programs           |
-| `corpus/travel-and-expense-policy.md`          | Per diems and lodging caps by region, expense category codes, approval thresholds                 |
-| `corpus/security-incident-response-runbook.md` | Severity levels SEV1 to SEV4, on-call rotation, escalation contacts, response checklist           |
-| `corpus/product-api-specification.md`          | Public API v3: authentication, rate limits per plan, webhooks, retry policy, errors               |
-| `corpus/pricing-and-plans.md`                  | Plans with PLN codes and prices, add-ons, discounts, renewals                                     |
-| `corpus/customer-support-sla.md`               | Priorities P1 to P4, response and resolution targets, support hours by time zone, service credits |
-| `corpus/engineering-onboarding-guide.md`       | Local setup commands, repository conventions, code review rules, deploys                          |
-| `corpus/data-retention-and-privacy-policy.md`  | Retention periods per data type, deletion process, DSAR handling                                  |
-| `questions.template.json`                      | Six example evaluation questions that show the format                                             |
-| `questions.json`                               | The real evaluation set (about 30 questions), written by hand, not created yet                    |
-| `verify-questions.mjs`                         | Checks that every answer is copied exactly from its document                                      |
+| Path                                           | What it is                                                                                            |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `corpus/employee-handbook.md`                  | Working hours, leave (annual, sick, parental), remote work, employee retention programs               |
+| `corpus/travel-and-expense-policy.md`          | Per diems and lodging caps by region, expense category codes, approval thresholds                     |
+| `corpus/security-incident-response-runbook.md` | Severity levels SEV1 to SEV4, on-call rotation, escalation contacts, response checklist               |
+| `corpus/product-api-specification.md`          | Public API v3: authentication, rate limits per plan, webhooks, retry policy, errors                   |
+| `corpus/pricing-and-plans.md`                  | Plans with PLN codes and prices, add-ons, discounts, renewals                                         |
+| `corpus/customer-support-sla.md`               | Priorities P1 to P4, response and resolution targets, support hours by time zone, service credits     |
+| `corpus/engineering-onboarding-guide.md`       | Local setup commands, repository conventions, code review rules, deploys                              |
+| `corpus/data-retention-and-privacy-policy.md`  | Retention periods per data type, deletion process, DSAR handling                                      |
+| `questions.template.json`                      | Six example evaluation questions that show the format                                                 |
+| `questions.json`                               | The real evaluation set: 40 questions, 5 per document, generated with Claude (an LLM) from the corpus |
+| `verify-questions.mjs`                         | Checks that every answer is copied exactly from its document                                          |
 
 The documents are 1,000 to 1,400 words each, use `#`, `##` and `###` headings, and contain tables and fenced code blocks. Facts are consistent across documents: for example, the Growth plan (PLN-GROWTH-24) costs 449 USD per site per month and allows 300 API requests per minute wherever it is mentioned.
 
@@ -48,7 +48,7 @@ A JSON array. Each entry has five string fields:
 ]
 ```
 
-- `id`: unique, for example `q01` to `q30`.
+- `id`: unique, for example `q01` to `q40`.
 - `question`: what a user would type into the chat.
 - `document`: the file name in `corpus/` that holds the answer (the file name only, no folder).
 - `answer`: a short span of 2 to 12 words copied character for character from that document. Pick a span that is unique enough to identify the right chunk. Copy text from inside a single table cell or a single line; do not span two table cells or two lines.
