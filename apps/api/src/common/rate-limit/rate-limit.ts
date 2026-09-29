@@ -3,9 +3,8 @@ import { minutes, ThrottlerGuard, type ThrottlerModuleOptions } from '@nestjs/th
 import type { AppRequest } from '../http/app-request.js';
 
 /**
- * Generous default for every route: 300 requests per minute, per route, per caller.
- * A stricter limit for one route overrides it on the handler, e.g. for chat:
- * `@Throttle({ default: { limit: 20, ttl: minutes(1) } })`.
+ * Default for every route: 300 requests per minute, per route, per caller. A route can
+ * override it with `@Throttle`, as chat does (20 per minute).
  */
 export const RATE_LIMIT_OPTIONS: ThrottlerModuleOptions = {
   throttlers: [{ name: 'default', ttl: minutes(1), limit: 300 }],

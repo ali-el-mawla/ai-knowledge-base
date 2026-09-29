@@ -13,9 +13,8 @@ export const EMPTY_DRAFT: DocumentDraft = { title: '', content: '', tags: [] };
 const FIELD_ORDER: DocumentField[] = ['title', 'tags', 'content'];
 
 /**
- * Form state for the document editor: the draft being edited, the last saved version (to know
- * whether anything changed) and field errors, which appear after the first save attempt and
- * then update as the user types.
+ * Editor form state: the draft, the last saved version (for `dirty`) and field errors, which
+ * appear after the first save attempt and then update as the user types.
  */
 export function useDocumentDraft(initial: DocumentDraft, idBase: string) {
   const [draft, setDraft] = useState(initial);
@@ -30,7 +29,7 @@ export function useDocumentDraft(initial: DocumentDraft, idBase: string) {
     setDraft((current) => ({ ...current, [field]: value }));
   }, []);
 
-  /** Shows field errors from now on and moves focus to the first invalid field. */
+  /** Shows field errors from now on and focuses the first invalid field. */
   const reportErrors = useCallback(
     (fieldErrors: DocumentFieldErrors) => {
       setShowErrors(true);
@@ -43,8 +42,8 @@ export function useDocumentDraft(initial: DocumentDraft, idBase: string) {
   );
 
   /**
-   * Records a successful save. The draft takes the server's normalised values, unless the user
-   * kept typing while the request was in flight (then their newer text wins).
+   * The draft takes the server's normalised values, unless the user kept typing while the
+   * request was in flight (then their newer text wins).
    */
   const markSaved = useCallback((next: DocumentDraft, submitted: DocumentDraft) => {
     setSaved(next);

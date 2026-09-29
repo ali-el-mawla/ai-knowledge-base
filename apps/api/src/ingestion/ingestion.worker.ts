@@ -17,14 +17,13 @@ export type OutcomeListener = (outcome: IngestionOutcome) => void;
  * The in-process ingestion queue, bound as the application's `IngestionQueue`.
  *
  * - Coalesced by document id: a job carries only the id and reads the latest row when
- *   it runs, so a burst of edits to one document queues one job, not one per edit.
- * - Concurrency 1, in arrival order: the embedding model runs on one local GPU, which
- *   embeds one batch at a time anyway, so parallel jobs would only queue up on it (and,
- *   with a hosted provider, share one rate limit).
- * - Not durable: the queue lives in memory, but the database is the source of truth. A
- *   document stays `pending` or `processing` until its chunks are written, so a restart
- *   requeues whatever a stopped process left behind. Production would use a durable
- *   queue (pgmq or pg-boss) with retries and more than one worker.
+ *   it runs, so a burst of edits to one document queues one job.
+ * - Concurrency 1, in arrival order: the local GPU embeds one batch at a time anyway,
+ *   and a hosted provider has one rate limit.
+ * - In memory, but the database is the source of truth: a document stays `pending` or
+ *   `processing` until its chunks are written, so a restart requeues what a stopped
+ *   process left. Production would use a durable queue (pgmq or pg-boss) with retries
+ *   and several workers.
  */
 @Injectable()
 export class IngestionWorker

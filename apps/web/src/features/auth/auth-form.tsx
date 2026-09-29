@@ -92,7 +92,6 @@ export function AuthForm({ mode, next }: { mode: Mode; next: string }) {
     const errors = validate(mode, email, password);
     setFieldErrors(errors);
     if (errors.email || errors.password) {
-      // Move focus to the first field that needs attention.
       document.getElementById(errors.email ? ids.email : ids.password)?.focus();
       return;
     }

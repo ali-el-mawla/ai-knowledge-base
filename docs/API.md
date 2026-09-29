@@ -2,9 +2,9 @@
 
 Base URL: `http://127.0.0.1:4000/api`. Types live in `packages/shared` and are shared with the web app.
 
-**Auth.** Every route except `GET /health` needs `Authorization: Bearer <Supabase access token>`. The API verifies the token against the Supabase JWKS (ES256) and then queries the database _as that user_, so Row Level Security decides what the user can see. Another user's resource answers `404`, never `403`, so ids cannot be probed.
+Every route except `GET /health` needs `Authorization: Bearer <Supabase access token>`. The API verifies the token against the Supabase JWKS (ES256 or RS256) and queries the database as that user, so Row Level Security decides what they can see. Another user's resource answers `404`, never `403`, so ids cannot be probed.
 
-**Errors.** Always `{ "error": { "code", "message", "details"?, "requestId" } }` with codes from `API_ERROR_CODES`.
+Errors are always `{ "error": { "code", "message", "details"?, "requestId" } }`, with codes from `API_ERROR_CODES` (see [ARCHITECTURE.md](ARCHITECTURE.md#6-error-model)).
 
 | Method | Route                         | Body / query                                          | Response                                                                |
 | ------ | ----------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------- |
@@ -28,7 +28,7 @@ Base URL: `http://127.0.0.1:4000/api`. Types live in `packages/shared` and are s
 
 ## Chat stream
 
-`POST /conversations/:id/messages` validates the request, checks ownership and the rate limit **before** any byte is streamed, so those failures are normal JSON errors. After the headers are sent the stream is:
+`POST /conversations/:id/messages` validates the request and checks ownership and the rate limit before streaming, so those failures are normal JSON errors. After the headers, the stream is:
 
 ```
 event: start   data: { conversationId, userMessage, rewrittenQuery, sources }
@@ -37,6 +37,6 @@ event: done    data: { message }         (the saved assistant message)
 event: error   data: { code, message }   (instead of done, if generation fails)
 ```
 
-Rate limits: 300 requests per minute per route and user; the chat route allows 20 messages per minute per user (`429 RATE_LIMITED` with `Retry-After`). A conversation still called "New conversation" is renamed from its first question.
+Rate limits: 300 requests per minute per route and caller, and 20 chat messages per minute per user (`429 RATE_LIMITED` with `Retry-After`). A conversation still called "New conversation" is renamed after its first question.
 
-Closing the connection aborts the upstream model call; the partial answer is saved with `status: "aborted"`. Browsers cannot send an `Authorization` header with `EventSource`, so the web app reads the stream with `fetch` and the `createSseParser()` from `@repo/shared`.
+Closing the connection aborts the upstream model call and saves the partial answer with `status: "aborted"`. `EventSource` cannot send an `Authorization` header, so the web app reads the stream with `fetch` and `createSseParser()` from `@repo/shared`.

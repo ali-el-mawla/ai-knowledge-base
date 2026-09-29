@@ -3,11 +3,10 @@ import { type Chunker } from '../types.js';
 import { contentBudget, normalizeNewlines, resolveChunkerOptions, toTextChunks } from './common.js';
 
 /**
- * Fixed-size chunker, the baseline the evaluation compares the markdown chunker against.
- * It ignores structure: a window of targetChars slides over the raw text and each new
- * window starts overlapChars before the previous one ended. Cuts fall on whitespace so
- * words stay whole; only a single word longer than the window is cut. It honours the same
- * hard limit (header included), so the comparison measures chunking and nothing else.
+ * Fixed-size chunker, the evaluation baseline. It ignores structure: a window of
+ * targetChars slides over the raw text, each new window starting overlapChars before the
+ * previous one ended. Cuts fall on whitespace; only a word longer than the window is cut.
+ * The hard limit (header included) is the same, so the comparison measures chunking only.
  */
 export const chunkFixedSize: Chunker = (input, options) => {
   const { targetChars, maxChars, overlapChars } = resolveChunkerOptions(options);

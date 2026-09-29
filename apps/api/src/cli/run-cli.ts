@@ -17,9 +17,8 @@ export type CliTask = (app: INestApplicationContext, config: AppConfig) => Promi
 
 /**
  * Runs a command inside a Nest application context (the API's providers, no HTTP
- * server): validates the configuration like main.ts, prints operator errors without a
- * stack, sets the exit code and always closes the context, which lets the ingestion
- * worker finish its current job.
+ * server). Prints operator errors without a stack, sets the exit code and always closes
+ * the context, which lets the ingestion worker finish its current job.
  */
 export async function runCli(task: CliTask): Promise<void> {
   let app: INestApplicationContext | undefined;
@@ -73,7 +72,6 @@ export function sumOutcomes(outcomes: Iterable<IngestionOutcome>): IngestionTota
   return totals;
 }
 
-/** One line per finished job, as the CLIs print them. */
 export function describeOutcome(outcome: IngestionOutcome, label: string): string {
   switch (outcome.status) {
     case 'ready':

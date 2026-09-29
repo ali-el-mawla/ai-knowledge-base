@@ -25,7 +25,7 @@ export interface IndexOptions {
 export interface IndexStats {
   documents: number;
   chunks: number;
-  /** Vectors computed by the embedding model in this run (0 when everything was reused). */
+  /** Vectors computed in this run. */
   embedded: number;
   /** Chunks whose vector was already stored under the same hash. */
   reused: number;
@@ -34,7 +34,6 @@ export interface IndexStats {
 }
 
 export interface IndexedCorpus {
-  /** This user's stored document ids, mapped to corpus file names. */
   fileByDocumentId: Map<string, string>;
   stats: IndexStats;
 }
@@ -56,9 +55,8 @@ interface StoredChunk {
 }
 
 /**
- * Makes the user's copy of the corpus match the files and the chunker, doing only the
- * work that changed: an unchanged document is skipped, and a chunk whose hash is already
- * stored keeps its vector, so a second run calls the embedding model zero times.
+ * Syncs the user's copy of the corpus with the files and the chunker. Unchanged documents
+ * are skipped and stored hashes keep their vectors, so a second run embeds no chunks.
  */
 export async function indexCorpus(options: IndexOptions): Promise<IndexedCorpus> {
   const stored = await syncDocuments(options.admin, options.userId, options.corpus);

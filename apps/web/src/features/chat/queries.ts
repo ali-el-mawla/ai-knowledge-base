@@ -79,14 +79,14 @@ export function useAiInfo() {
   });
 }
 
-/** Appends messages that are not in the list yet (matched by id), keeping the order. */
+/** Appends the messages whose ids are not in the list yet. */
 export function mergeMessages(current: Message[], incoming: readonly Message[]): Message[] {
   const known = new Set(current.map((message) => message.id));
   const added = incoming.filter((message) => !known.has(message.id));
   return added.length === 0 ? current : [...current, ...added];
 }
 
-/** Writes messages of a finished turn into the cached conversation, if it is cached. */
+/** No-op when the conversation is not cached. */
 export function addMessagesToCache(
   queryClient: QueryClient,
   conversationId: string,
@@ -103,8 +103,8 @@ export function addMessagesToCache(
 }
 
 /**
- * Marks the cached conversation as outdated without refetching now: the next visit loads
- * the server's copy. Used after a stop, when the server is still saving the partial answer.
+ * Marks the cached conversation stale without refetching, so the next visit loads the
+ * server's copy. Used after a stop, while the server is still saving the partial answer.
  */
 export function markConversationStale(queryClient: QueryClient, conversationId: string) {
   return queryClient.invalidateQueries({
@@ -128,10 +128,7 @@ function updateListItem(queryClient: QueryClient, conversation: Conversation) {
   );
 }
 
-/**
- * Creates an empty conversation and seeds its detail cache, so its page renders at once
- * (with the answer that is about to stream) instead of loading an empty history.
- */
+/** Seeds the new conversation's detail cache so its page renders at once, without a load. */
 export function useCreateConversation() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -165,8 +162,8 @@ export function useRenameConversation() {
 }
 
 /**
- * Deletes a conversation and drops its cached history. `useConversation` stops fetching a
- * deleted id, so the page still showing it does not refetch (and 404) before it navigates.
+ * `useConversation` stops fetching a deleted id, so the page still showing it does not
+ * refetch (and 404) before it navigates away.
  */
 export function useDeleteConversation() {
   const queryClient = useQueryClient();

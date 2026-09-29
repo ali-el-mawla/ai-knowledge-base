@@ -1,6 +1,5 @@
 import { AppLogo } from '@/components/brand/app-logo';
 
-/** Centered, single-card layout for the sign-in and sign-up pages. */
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-8 bg-muted/40 px-4 py-12">

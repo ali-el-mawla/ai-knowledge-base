@@ -7,8 +7,8 @@ import { cn } from '@/lib/utils';
 export type OpenSource = (source: Source, trigger: HTMLElement) => void;
 
 /**
- * The source's heading trail inside its document. Most documents open with a heading equal
- * to their title; that first step is left out, since the title is always shown next to it.
+ * The heading trail without a first step that repeats the document title (most documents
+ * open with one), since the title is always shown next to it.
  */
 export function sectionPath(source: Source): string {
   const [first, ...rest] = source.headingPath.split(' > ');
@@ -22,7 +22,6 @@ export function sourceLabel(source: Source): string {
   return section ? `${source.documentTitle}, ${section}` : source.documentTitle;
 }
 
-/** A citation marker in an answer: a small numbered badge that opens its source. */
 export function CitationChip({
   source,
   active,

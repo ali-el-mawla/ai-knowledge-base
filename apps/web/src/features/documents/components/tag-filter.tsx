@@ -31,7 +31,7 @@ function FilterChip({
   );
 }
 
-/** One chip per tag (with its document count) plus "All". Selecting a chip again clears it. */
+/** Selecting the active chip again clears the filter. */
 export function TagFilter({
   selected,
   onSelect,

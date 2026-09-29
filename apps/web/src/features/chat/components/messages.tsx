@@ -42,7 +42,7 @@ interface AssistantMessageProps {
   messageId: string;
   content: string;
   status: AnswerStatus;
-  /** Everything retrieved for this turn (the snapshot saved with the message). */
+  /** Everything retrieved for this turn (the snapshot saved with the answer). */
   sources: Source[];
   /** Numbers the answer cites (validated by the server once saved). */
   citations: number[];
@@ -52,11 +52,7 @@ interface AssistantMessageProps {
   onOpenSource: OpenMessageSource;
 }
 
-/**
- * One answer: the rewritten search query when there was one, the markdown with citation
- * chips, a status badge for stopped or failed answers, the sources, and a copy button.
- * Memoised: while a new answer streams, the earlier ones do not re-render.
- */
+/** Memoised: while a new answer streams, the earlier ones do not re-render. */
 export const AssistantMessage = memo(function AssistantMessage({
   messageId,
   content,

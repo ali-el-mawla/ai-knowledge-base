@@ -26,7 +26,7 @@ import { CurrentUser } from '../auth/current-user.decorator.js';
 import { ParseUuidPipe, ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 import { DocumentsService } from './documents.service.js';
 
-/** HTTP only: validation, status codes and delegation. The rules live in DocumentsService. */
+/** HTTP only; the rules live in DocumentsService. */
 @Controller('documents')
 export class DocumentsController {
   constructor(private readonly documents: DocumentsService) {}

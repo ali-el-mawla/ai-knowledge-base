@@ -53,11 +53,11 @@ interface DocumentFieldsProps {
   tab: EditorTab;
   onTabChange: (tab: EditorTab) => void;
   disabled?: boolean;
-  /** Extra tab (the chunks view of a saved document): its trigger label and its panel. */
+  /** The chunks tab of a saved document. */
   chunksTab?: { label: React.ReactNode; panel: React.ReactNode };
 }
 
-/** Title, tags and the markdown content with Write / Preview tabs. Shared by new and edit. */
+/** Shared by the new and edit forms. */
 export function DocumentFields({
   idBase,
   draft,
@@ -133,7 +133,7 @@ export function DocumentFields({
           </TabsList>
           {tab !== 'chunks' && <ContentCounter id={ids.counter} length={draft.content.length} />}
         </div>
-        {/* Above the editor rather than below it, so it is visible without scrolling. */}
+        {/* Above the editor, so it is visible without scrolling. */}
         {tab !== 'chunks' && <FieldError id={`${ids.content}-error`} message={errors.content} />}
 
         <TabsContent value="write" className="grid gap-2">

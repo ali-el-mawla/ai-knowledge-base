@@ -5,7 +5,6 @@ import { ChatService } from './chat.service.js';
 import { ConversationsController } from './conversations.controller.js';
 import { ConversationsService } from './conversations.service.js';
 
-/** Conversations CRUD and the streaming RAG chat. */
 @Module({
   imports: [RetrievalModule],
   controllers: [ConversationsController, ChatController],

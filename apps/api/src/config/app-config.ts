@@ -62,10 +62,7 @@ const envSchema = z.object({
   WEB_ORIGIN: z.preprocess(blankAsUndefined, httpUrl.default('http://127.0.0.1:3000')),
 });
 
-/**
- * Reads and validates the environment. Throws a `ConfigError` listing every problem.
- * Pure (no side effects), so tests can pass any env object.
- */
+/** Throws a `ConfigError` listing every problem. Pure, so tests can pass any env object. */
 export function loadAppConfig(env: Env): AppConfig {
   const problems: string[] = [];
 

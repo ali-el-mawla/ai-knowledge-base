@@ -8,20 +8,20 @@ import { packSegments, splitFramed, splitLines, splitProse, trailingSentences } 
 /**
  * Structure-aware markdown chunker.
  *
- * 1. The marked lexer turns the document into top-level blocks. Every heading opens a new
+ * 1. The marked lexer splits the document into top-level blocks. Every heading opens a
  *    section, and its heading path ("Leave policy > Parental leave") travels with each chunk.
  * 2. Within a section, whole blocks are merged until the next one would pass targetChars
  *    (a chunk shorter than overlapChars also takes the next block, within the hard limit).
- *    Sections are never merged, so a chunk is always about one topic.
- * 3. A block that is too big for the hard limit on its own is split at the most natural
- *    boundary its type allows: list items, then sentences, then words for prose; lines for
- *    code and tables, repeating the fence or the header rows so each piece stays valid.
- * 4. When a section needs several chunks, each chunk after the first starts with the last
+ *    Sections are never merged, so a chunk stays on one topic.
+ * 3. A block too big for the hard limit on its own is split at the most natural boundary
+ *    its type allows: list items, then sentences, then words for prose; lines for code and
+ *    tables, repeating the fence or header rows so each piece stays valid.
+ * 4. When a section needs several chunks, each one after the first starts with the last
  *    sentences of the previous one, so a fact cut at a boundary is findable from both sides.
  *
- * The hard limit includes the header: buildEmbeddingText(title, headingPath, content)
- * never exceeds maxChars, because the embedding model silently truncates oversized input
- * (the tail of the chunk would be stored but never embedded).
+ * The hard limit includes the header (buildEmbeddingText never exceeds maxChars) because
+ * the embedding model silently truncates oversized input: the tail would be stored but
+ * never embedded.
  */
 export const chunkMarkdown: Chunker = (input, options) => {
   const resolved = resolveChunkerOptions(options);
@@ -35,7 +35,7 @@ export const chunkMarkdown: Chunker = (input, options) => {
   return toTextChunks(drafts);
 };
 
-/** A top-level markdown block, with what is needed to split it if it is too big. */
+/** A top-level markdown block, with the parts needed to split it. */
 type Block =
   | { kind: 'prose'; text: string }
   | { kind: 'list'; text: string; items: string[] }
@@ -48,7 +48,7 @@ interface Section {
   blocks: Block[];
 }
 
-/** A block, or a part of a split block, small enough to go into a chunk. */
+/** A block, or part of a split block, that fits in a chunk. */
 interface Piece {
   text: string;
   /** Pieces of the same block are joined with a line break, pieces of different blocks with a blank line. */
@@ -164,11 +164,7 @@ function tableBlock(text: string): Block {
   };
 }
 
-/**
- * A pathological heading (hundreds of characters, or a very deep trail) must not eat the
- * room for content, so the header may use at most half of maxChars; a longer heading
- * path is cut.
- */
+/** The header may use at most half of maxChars, so a pathological heading path is cut. */
 function fitHeadingPath(title: string, headingPath: string, maxChars: number): string {
   const maxHeaderChars = Math.floor(maxChars / 2);
   if (buildChunkHeader(title, headingPath).length <= maxHeaderChars) return headingPath;
@@ -230,9 +226,9 @@ function groupPieces(
   let current: Piece[] = [];
   for (const piece of pieces) {
     const mergedLength = joinPieces([...current, piece]).length;
-    // A chunk no longer than the overlap is too small to stand alone (think of a one-line
-    // intro before a big code block), and the next chunk would repeat it whole anyway,
-    // so it takes the next piece too, as long as the hard limit allows.
+    // A chunk no longer than the overlap (say, a one-line intro before a big code block)
+    // would be repeated whole by the next chunk anyway, so it takes the next piece too,
+    // within the hard limit.
     const tooSmallToStandAlone =
       joinPieces(current).length <= overlapChars && mergedLength <= budget;
     if (current.length === 0 || mergedLength <= target || tooSmallToStandAlone) {
@@ -248,10 +244,9 @@ function groupPieces(
 }
 
 /**
- * The trailing sentences of a chunk, to repeat at the start of the next chunk. This only
- * runs inside one section: overlap across a heading would mix two topics in one chunk.
- * Only prose lends overlap, because the tail of a code block or a table would leave a
- * fence or a table fragment that the next chunk cannot close.
+ * The trailing sentences to repeat at the start of the next chunk. Only used within one
+ * section (overlap across a heading would mix two topics), and only prose lends overlap:
+ * the tail of a code block or table would leave a fragment the next chunk cannot close.
  */
 function overlapPiece(group: readonly Piece[], overlapChars: number): Piece | null {
   const last = group.at(-1);

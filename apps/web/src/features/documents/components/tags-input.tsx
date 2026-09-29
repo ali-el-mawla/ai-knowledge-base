@@ -24,9 +24,8 @@ export function normalizeTag(raw: string): string {
 }
 
 /**
- * A tag field: type a tag and press Enter or comma to add it (pasting "a, b, c" adds three),
- * Backspace in the empty field removes the last tag, and each tag has a remove button.
- * Tags are trimmed, lowercased and de-duplicated; a hint explains anything that was refused.
+ * Enter or comma adds a tag (pasting "a, b, c" adds three); Backspace in the empty field
+ * removes the last one. A hint explains any tag that was refused.
  */
 export function TagsInput({
   id,
@@ -45,7 +44,7 @@ export function TagsInput({
   const hintId = useId();
   const atLimit = value.length >= maxTags;
 
-  /** Adds each raw tag in order and reports the first reason one was refused. */
+  /** Reports the first reason a tag was refused. */
   function commit(rawTags: string[]) {
     const next = [...value];
     let refusal: string | null = null;

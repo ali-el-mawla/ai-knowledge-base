@@ -29,7 +29,6 @@ export const DEFAULT_CONVERSATION_TITLE = 'New conversation';
 /** No pagination yet: the sidebar lists the most recent conversations only. */
 const CONVERSATION_LIST_LIMIT = 200;
 
-/** An answer as the chat service hands it over for saving. */
 export interface AssistantMessageDraft {
   content: string;
   status: MessageStatus;
@@ -42,11 +41,10 @@ export interface AssistantMessageDraft {
 }
 
 /**
- * Conversations and their messages. Everything a user asks for runs through their own
- * client, so RLS makes another user's conversation simply not exist (404). The one
- * exception is saving an assistant answer: users are not allowed to write assistant
- * messages (so they cannot forge turns that later re-enter the prompt as history), so
- * the API writes them with the admin client after ownership was checked.
+ * User requests run through the user's own client, so RLS hides another user's
+ * conversation (404). The exception is saving an assistant answer: users may not write
+ * assistant rows (a forged turn would re-enter the prompt as history), so the API writes
+ * them with the admin client after checking ownership.
  */
 @Injectable()
 export class ConversationsService {
@@ -141,9 +139,9 @@ export class ConversationsService {
   }
 
   /**
-   * The last `limit` finished messages, oldest first, read from the database: the client
-   * never supplies history, so it cannot put words in the assistant's mouth. Aborted and
-   * failed answers are left out; they are partial.
+   * The last `limit` finished messages, oldest first. History comes from the database,
+   * never the client, so a client cannot put words in the assistant's mouth. Aborted and
+   * failed answers are partial and left out.
    */
   async recentHistory(
     user: AuthUser,
@@ -162,10 +160,9 @@ export class ConversationsService {
   }
 
   /**
-   * Admin client, because users may not write assistant rows. The caller has already
-   * proven ownership with `getOwned`; the explicit `user_id` and the composite foreign
-   * key (conversation_id, user_id) are a second lock: the row cannot land in a
-   * conversation that belongs to someone else.
+   * Admin client, because users may not write assistant rows. The caller has checked
+   * ownership with `getOwned`; the explicit `user_id` and the composite foreign key
+   * (conversation_id, user_id) also stop the row from landing in someone else's conversation.
    */
   async saveAssistantMessage(
     user: AuthUser,

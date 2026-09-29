@@ -1,8 +1,6 @@
 #!/usr/bin/env node
-// One-command setup: `npm run setup`.
-// Idempotent and non-destructive: safe to run again at any time. It never resets the
-// database (that is `npm run db:reset`, on purpose). Uses Node built-ins only, so it
-// works before `npm install`.
+// `npm run setup`. Safe to run again: it never resets the database (only
+// `npm run db:reset` does). Node built-ins only, so it runs before `npm install`.
 import { spawnSync } from 'node:child_process';
 import { copyFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';

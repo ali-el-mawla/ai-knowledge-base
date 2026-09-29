@@ -9,9 +9,8 @@ interface AppErrorOptions {
 }
 
 /**
- * Base class for errors the application throws on purpose. Each subclass fixes the
- * HTTP status and API error code, so services express *what* went wrong and the
- * exception filter alone decides how it is rendered.
+ * Errors the application throws on purpose. Each subclass fixes the HTTP status and
+ * error code; the exception filter decides how it is rendered.
  */
 export abstract class AppError extends Error {
   abstract readonly status: number;

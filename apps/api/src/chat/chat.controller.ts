@@ -10,9 +10,8 @@ import { createSseSink } from './chat-event-sink.js';
 import { ChatService } from './chat.service.js';
 
 /**
- * Every message costs a model call, so chat gets a far stricter limit than the default
- * 300 per minute: 20 messages per minute per user (the throttler tracks signed-in users
- * by id). It overrides the default throttler for this route only.
+ * Every message costs a model call, so this route allows 20 messages per minute per user
+ * instead of the default 300 (the throttler tracks signed-in users by id).
  */
 export const CHAT_RATE_LIMIT = { limit: 20, ttl: minutes(1) };
 
@@ -21,12 +20,10 @@ export class ChatController {
   constructor(private readonly chat: ChatService) {}
 
   /**
-   * Streams the answer as server-sent events over a plain POST response. Not `@Sse()`:
-   * that only serves GET, and browsers' EventSource cannot send the Authorization header;
-   * the web app reads this stream with fetch.
-   *
-   * Authentication, the rate limit, validation and the ownership check all run before the
-   * first byte, so their failures are ordinary JSON errors (401, 429, 400, 404, 503).
+   * Server-sent events over a POST response, read by the web app with fetch. Not `@Sse()`:
+   * that only serves GET, and EventSource cannot send the Authorization header.
+   * Auth, the rate limit, validation and the ownership check run before the first byte,
+   * so their failures are ordinary JSON errors (401, 429, 400, 404, 503).
    */
   @Post(':id/messages')
   @Throttle({ default: CHAT_RATE_LIMIT })

@@ -55,7 +55,6 @@ function useSaveShortcut(formRef: React.RefObject<HTMLFormElement | null>, enabl
   }, [formRef, enabled]);
 }
 
-/** Sticky bar above the form: back link, title, status and actions. */
 function EditorToolbar({
   heading,
   status,
@@ -369,7 +368,6 @@ function ExistingDocumentEditor({ id }: { id: string }) {
   );
 }
 
-/** The document editor: a blank form for /documents/new, or the saved document for /documents/[id]. */
 export function DocumentEditor({ documentId }: { documentId?: string }) {
   return documentId ? <ExistingDocumentEditor id={documentId} /> : <NewDocumentEditor />;
 }

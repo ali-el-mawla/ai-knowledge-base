@@ -60,9 +60,9 @@ interface GenerationStats {
 }
 
 /**
- * Chunk, embed and store one document: the RAG indexing pipeline. Only chunks whose
- * hash (model, dimensions, prefix, header, text) is new are embedded; everything else
- * reuses its stored vector, so editing one paragraph costs one embedding.
+ * Chunks, embeds and stores one document. Only chunks whose hash (model, dimensions,
+ * prefix, header, text) is new are embedded; the rest reuse their stored vector, so
+ * editing one paragraph costs one embedding.
  */
 @Injectable()
 export class IngestionService {

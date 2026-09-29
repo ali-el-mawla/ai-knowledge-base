@@ -1,10 +1,10 @@
 # Fixtures: the Quaylark sample corpus
 
-This folder holds the sample documents and the evaluation questions for the knowledge base.
+The sample documents and the evaluation questions.
 
 ## The company is fictional
 
-Quaylark Systems, Inc. is an invented mid-size B2B SaaS company (about 430 employees, offices in Toronto, Rotterdam and Singapore) that sells a dock appointment scheduling and yard management platform to warehouses, third-party logistics providers and carriers. Every person is a role (Head of Security, Data Protection Officer, and so on), and every domain uses the reserved `.example` or `.test` top-level domains. Any resemblance to a real company is accidental.
+Quaylark Systems, Inc. is an invented B2B SaaS company (about 430 employees, offices in Toronto, Rotterdam and Singapore) that sells a dock appointment scheduling and yard management platform to warehouses, third-party logistics providers and carriers. Every person is a role (Head of Security, Data Protection Officer, and so on), and every domain uses the reserved `.example` or `.test` top-level domains. Any resemblance to a real company is accidental.
 
 ## What is here
 
@@ -26,11 +26,10 @@ The documents are 1,000 to 1,400 words each, use `#`, `##` and `###` headings, a
 
 ## How the corpus is used
 
-1. Seed: the eight documents are loaded into the demo account, so a fresh install has something to search and chat with.
-2. Demo: the demo video asks questions against these documents and shows the cited chunks.
-3. Evaluation: the retrieval evaluation runs every question in `questions.json` against each combination of chunking strategy (naive fixed-size, structure-aware by headings) and retrieval mode (vector, keyword, hybrid). The intended scoring: a question is a hit at rank k when a retrieved chunk from the right `document` contains the `answer` span, which gives hit rate and mean reciprocal rank per combination.
+- `npm run seed` loads the eight documents into the demo account, so a fresh install has something to search and chat with.
+- `npm run eval` runs every question in `questions.json` against each combination of chunking strategy (naive fixed-size, structure-aware) and retrieval mode (vector, keyword, hybrid). A question is a hit at rank k when a retrieved chunk from the right `document` contains the `answer` span; the report gives hit rates and mean reciprocal rank per combination in [docs/EVAL.md](../docs/EVAL.md).
 
-The corpus deliberately includes cases that separate the strategies: the same word with different meanings in different documents ("retention", "escalation", "limits"), a `### Limits` section in both the API specification and the expense policy, exact codes such as `EXP-TRV-04`, `PLN-GROWTH-24` and `SEV2`, facts that live only in a table cell, and facts that live only in a comment inside a code block.
+The corpus includes cases that separate the strategies on purpose: the same word with different meanings in different documents ("retention", "escalation", "limits"), a `### Limits` section in both the API specification and the expense policy, exact codes such as `EXP-TRV-04`, `PLN-GROWTH-24` and `SEV2`, facts that live only in a table cell, and facts that live only in a comment inside a code block.
 
 ## Format of `questions.json`
 
@@ -51,7 +50,7 @@ A JSON array. Each entry has five string fields:
 - `id`: unique, for example `q01` to `q40`.
 - `question`: what a user would type into the chat.
 - `document`: the file name in `corpus/` that holds the answer (the file name only, no folder).
-- `answer`: a short span of 2 to 12 words copied character for character from that document. Pick a span that is unique enough to identify the right chunk. Copy text from inside a single table cell or a single line; do not span two table cells or two lines.
+- `answer`: a span of 2 to 12 words copied character for character from that document, unique enough to identify the right chunk, and inside a single table cell or line.
 - `type`: one of `exact-code`, `table`, `nested-heading`, `ambiguous-term`, `code-block`, `paraphrase`.
 
 | Type             | Meaning                                                                                         |
@@ -72,6 +71,6 @@ node fixtures/verify-questions.mjs                       # checks questions.json
 node fixtures/verify-questions.mjs fixtures/questions.template.json
 ```
 
-The script uses Node built-ins only. It fails (exit code 1) when the JSON is malformed, an id is repeated, a type is unknown, a document does not exist, or an answer is not found verbatim in its document. It warns, without failing, when an answer is shorter than 2 or longer than 12 words, appears more than once in its document, also appears in another document, or is contained in the question itself. It ends with a count of questions per type and per document.
+It uses Node built-ins only and fails (exit code 1) when the JSON is malformed, an id is repeated, a type is unknown, a document does not exist, or an answer is not found verbatim in its document. It warns without failing when an answer is shorter than 2 or longer than 12 words, appears more than once in its document, also appears in another document, or is contained in the question itself. It ends with a count of questions per type and per document.
 
 If you edit a corpus document after writing questions, run the script again: a changed sentence can break an answer span.

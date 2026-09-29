@@ -4,9 +4,8 @@ function isHighSurrogate(charCode: number): boolean {
 }
 
 /**
- * Moves a cut position back by one when cutting there would split a surrogate pair,
- * so a cut never leaves a broken character. Positions and lengths are UTF-16 code
- * units, like String.length, which is also how every limit in this package is measured.
+ * Moves a cut back by one when it would split a surrogate pair. Positions are UTF-16
+ * code units, like String.length and every limit in this package.
  */
 export function safeCutIndex(text: string, index: number): number {
   const splitsPair =

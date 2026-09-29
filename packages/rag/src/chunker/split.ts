@@ -6,9 +6,9 @@ import { safeCutIndex } from '../text.js';
  * items) that concatenate back to it exactly, so packing them never loses or reorders text.
  */
 
-// Unicode sentence boundaries (UAX #29): handles "e.g. this", other scripts and
-// punctuation, and always breaks after a newline, which keeps list lines apart.
-// The locale is fixed so every machine produces the same boundaries, hence the same chunks.
+// Unicode sentence boundaries (UAX #29) handle "e.g. this" and other scripts, and always
+// break after a newline, which keeps list lines apart. A fixed locale gives the same
+// chunks on every machine.
 const sentenceSegmenter = new Intl.Segmenter('en', { granularity: 'sentence' });
 
 export function segmentSentences(text: string): string[] {
@@ -26,9 +26,8 @@ export function segmentLines(text: string): string[] {
 }
 
 /**
- * Greedily packs consecutive segments into pieces of at most `limit` characters.
- * A segment that is too long on its own goes to `splitOversized`, which cuts it finer.
- * Pieces keep their leading whitespace (code indentation matters) but not the trailing.
+ * Greedily packs segments into pieces of at most `limit` characters; a segment too long
+ * on its own goes to `splitOversized`. Pieces keep leading whitespace (code indentation).
  */
 export function packSegments(
   segments: readonly string[],
@@ -55,7 +54,7 @@ export function packSegments(
   return pieces;
 }
 
-/** The last resort: fixed-size cuts, for a "word" such as a URL or a hash longer than the limit. */
+/** Last resort for a single "word" (a URL, a hash) longer than the limit. */
 export function hardCut(text: string, limit: number): string[] {
   const pieces: string[] = [];
   let start = 0;

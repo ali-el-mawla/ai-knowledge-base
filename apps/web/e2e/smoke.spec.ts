@@ -2,12 +2,9 @@ import { randomUUID } from 'node:crypto';
 import { expect, test } from '@playwright/test';
 
 /**
- * One pass through the product, the way a new user takes it: sign up, add a document that
- * holds a fact no model can know, wait until it is indexed, ask the chat about it, follow
- * the citation to the exact passage, then delete the document.
- *
- * It runs against the real stack (Supabase, the embedding model, the chat model), so it
- * proves the pieces work together; the unit and integration suites cover the details.
+ * One pass through the product as a new user: sign up, add a document holding a fact no model
+ * can know, wait until it is indexed, ask the chat about it, open the cited passage, delete
+ * the document. Runs against the real stack (Supabase, the embedding and chat models).
  */
 
 const TITLE = 'Zephyr project brief';

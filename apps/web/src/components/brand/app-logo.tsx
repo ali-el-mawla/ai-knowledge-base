@@ -3,7 +3,6 @@ import { cn } from '@/lib/utils';
 
 export const APP_NAME = 'Knowledge Base';
 
-/** The app mark and name, used in the top bar and on the sign-in pages. */
 export function AppLogo({ className }: { className?: string }) {
   return (
     <span className={cn('flex items-center gap-2 font-semibold tracking-tight', className)}>

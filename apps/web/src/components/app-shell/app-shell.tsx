@@ -5,9 +5,8 @@ import { NavLinks } from './nav-links';
 import { UserMenu } from './user-menu';
 
 /**
- * The signed-in frame: a top bar (menu button on mobile, app name, user menu), a sidebar on
- * md+ screens, and `main` as the scroll container. Pages fill `main`; a page that manages its
- * own scrolling (the chat) can use `h-full` and `overflow-hidden`.
+ * The signed-in frame. `main` is the scroll container; a page that scrolls itself (the chat)
+ * can use `h-full` and `overflow-hidden`.
  */
 export function AppShell({ email, children }: { email: string; children: React.ReactNode }) {
   return (

@@ -52,7 +52,7 @@ describe('reciprocal rank', () => {
   it('averages over all questions, a miss counting as 0', () => {
     // (1 + 1/2 + 1/4 + 0) / 4 = 1.75 / 4 = 0.4375
     expect(meanReciprocalRank([1, 2, 4, null], 10)).toBeCloseTo(0.4375, 10);
-    // (1/5 + 0) / 2 with cutoff 3: rank 5 is outside, so both count 0
+    // With cutoff 3, rank 5 is outside, so both count 0.
     expect(meanReciprocalRank([5, null], 3)).toBe(0);
     expect(meanReciprocalRank([], 10)).toBe(0);
   });

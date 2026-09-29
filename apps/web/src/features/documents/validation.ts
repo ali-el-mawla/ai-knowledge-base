@@ -79,9 +79,8 @@ export function sameDraft(a: DocumentDraft, b: DocumentDraft): boolean {
 }
 
 /**
- * Builds a PATCH body with only the fields that differ from the saved version, so a tag-only
- * edit does not make the API re-embed the document. `data` is null when, once normalised
- * (trimmed), nothing differs.
+ * A PATCH body with only the changed fields, so a tag-only edit does not re-embed the
+ * document. `data` is null when nothing differs once trimmed.
  */
 export function buildUpdate(
   draft: DocumentDraft,

@@ -1,21 +1,18 @@
 /**
- * Known OpenAI-compatible providers. Everything provider-specific lives here as data
- * (base URL, auth, capability flags), so switching provider is a configuration change
- * and the model classes contain no `if (provider === ...)` branches.
+ * Known OpenAI-compatible providers as data (base URL, auth, capability flags), so the
+ * model classes never branch on a provider name.
  *
- * Capability flags were checked against each provider's documentation on 26 Sep 2026;
- * the comment above each preset cites the pages and names any value the docs leave open.
+ * Flags were checked against each provider's documentation on 26 Sep 2026; the comment
+ * above each preset cites the pages and names any value the docs leave open.
  */
 
 export interface ChatCapabilities {
-  /** Name of the request field that caps output length. */
   maxTokensParam: 'max_tokens' | 'max_completion_tokens';
   /** Supported temperature range; requests are clamped into it. */
   temperatureRange: readonly [min: number, max: number];
   /**
-   * Send `stream_options.include_usage` to get token usage in the last stream chunk.
-   * False when the provider does not document it or sends usage without being asked;
-   * usage is read from the stream whenever it arrives.
+   * Send `stream_options.include_usage` to get usage in the last chunk. False when the
+   * provider does not document it or sends usage unasked; usage is read whenever it arrives.
    */
   streamUsage: boolean;
 }
@@ -23,7 +20,6 @@ export interface ChatCapabilities {
 export interface EmbeddingCapabilities {
   /** Accepts the `dimensions` request field (Matryoshka / shortened embeddings). */
   supportsDimensions: boolean;
-  /** Maximum number of inputs per embeddings request. */
   maxBatch: number;
 }
 
@@ -115,10 +111,7 @@ export const PROVIDER_PRESETS = {
 
 export type PresetName = keyof typeof PROVIDER_PRESETS;
 
-/**
- * Used when *_PROVIDER=custom: any server that speaks the OpenAI API, reached by
- * *_BASE_URL. Conservative flags; override nothing else.
- */
+/** The "custom" provider: any OpenAI-compatible server at *_BASE_URL, with conservative flags. */
 export const CUSTOM_PRESET: ProviderPreset = {
   name: 'custom',
   baseUrl: '',

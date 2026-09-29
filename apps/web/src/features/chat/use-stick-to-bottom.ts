@@ -6,9 +6,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 const BOTTOM_THRESHOLD_PX = 64;
 
 /**
- * Keeps a scroll container pinned to its end while its content grows (a streaming answer),
- * until the user scrolls up to read something; then it stays put and `pinned` turns false,
- * so the view can offer a "Jump to latest" button. Reaching the end again re-pins it.
+ * Keeps a scroll container pinned to its end while its content grows, until the user scrolls
+ * up; then `pinned` turns false (for a "Jump to latest" button). Reaching the end re-pins it.
  */
 export function useStickToBottom() {
   const scrollRef = useRef<HTMLDivElement>(null);

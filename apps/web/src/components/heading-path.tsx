@@ -1,10 +1,7 @@
 import { ChevronRightIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-/**
- * The heading trail of a chunk ("Leave > Parental leave") as a compact breadcrumb. One
- * truncated line by default; `wrap` shows it whole, for places with room to spare.
- */
+/** A chunk's heading trail as a breadcrumb: one truncated line, or whole with `wrap`. */
 export function HeadingPath({
   path,
   wrap = false,

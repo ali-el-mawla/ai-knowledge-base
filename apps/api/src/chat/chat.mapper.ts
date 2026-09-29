@@ -9,10 +9,7 @@ import type {
 import { z } from 'zod';
 import type { Json, Tables } from '../database.types.js';
 
-/**
- * Row shapes of `conversations` and `messages` and their mapping to the shared DTOs.
- * As for documents, `user_id` is never selected: ownership is implied by RLS.
- */
+/** As for documents, `user_id` is never selected: RLS already implies ownership. */
 export const CONVERSATION_COLUMNS = 'id, title, created_at, updated_at';
 export type ConversationRow = Pick<
   Tables<'conversations'>,

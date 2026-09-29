@@ -20,7 +20,7 @@ function formatRank(rank: number | null, missing: string): string {
   return rank === null ? missing : `#${rank}`;
 }
 
-/** Why this passage was retrieved: its place in each search arm and the fused score. */
+/** Why this passage was retrieved: its rank in each search arm and the fused score. */
 function RetrievalRanks({ score }: { score: Source['score'] }) {
   const items = [
     { label: 'Semantic', value: formatRank(score.semanticRank, 'Not ranked') },
@@ -40,9 +40,8 @@ function RetrievalRanks({ score }: { score: Source['score'] }) {
 }
 
 /**
- * Every grid item here is `min-w-0`: by default a grid item is at least as wide as its
- * content, so wide content in the passage (a table) would widen the whole panel and cut off
- * the text around it, instead of scrolling inside its own box.
+ * Every grid item here is `min-w-0`. A grid item is otherwise at least as wide as its content,
+ * so a wide table in the passage would widen the panel instead of scrolling in its own box.
  */
 function SourceBody({ source }: { source: Source }) {
   return (
@@ -124,10 +123,7 @@ function SourceColumn({ source, onClose }: { source: Source; onClose: () => void
   );
 }
 
-/**
- * The passage behind a citation: document, heading trail, retrieval ranks and the exact
- * chunk text. A right column on wide screens, a sheet on small ones.
- */
+/** The passage behind a citation: a right column on wide screens, a sheet on small ones. */
 export function SourcePanel({
   source,
   docked,

@@ -12,8 +12,8 @@ const SAFE_REQUEST_ID = /^[\w.-]{1,128}$/;
  * new UUID. The id is echoed in the response header and in every error body, so a
  * user-reported error can be matched to its log line.
  *
- * Plain Express middleware (not a Nest middleware class) on purpose: it is mounted
- * first, before the body parser, so even a 413 or malformed-JSON error has an id.
+ * Plain Express middleware, mounted first (before the body parser), so even a 413 or
+ * malformed-JSON error has an id.
  */
 export function requestIdMiddleware(req: AppRequest, res: Response, next: NextFunction): void {
   const incoming = req.get(REQUEST_ID_HEADER);

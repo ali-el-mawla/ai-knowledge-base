@@ -14,10 +14,6 @@ const IN_PROGRESS_LABEL = {
   processing: 'Indexing',
 } as const;
 
-/**
- * Where a document is in the ingestion pipeline: queued or indexing (with a spinner), ready
- * (with its chunk count) or failed (with the error in a tooltip and for screen readers).
- */
 export function DocumentStatusBadge({
   ingestion,
   className,

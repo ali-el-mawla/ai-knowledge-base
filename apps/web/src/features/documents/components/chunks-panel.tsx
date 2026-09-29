@@ -71,10 +71,7 @@ function ChunksSkeleton() {
   );
 }
 
-/**
- * How the saved document was split for retrieval: each chunk with its position, the heading
- * trail it sits under and its token estimate. Refreshes by itself when a new ingestion run ends.
- */
+/** Refreshes by itself when a new ingestion run ends (the query is keyed by `ingestedAt`). */
 export function ChunksPanel({
   document,
   hasUnsavedChanges,

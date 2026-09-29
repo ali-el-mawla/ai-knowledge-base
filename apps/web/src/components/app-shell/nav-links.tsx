@@ -16,7 +16,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { href: '/chat', label: 'Chat', icon: MessagesSquareIcon },
 ];
 
-/** The main navigation, shared by the desktop sidebar and the mobile sheet. */
+/** Shared by the desktop sidebar and the mobile sheet. */
 export function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
 

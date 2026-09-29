@@ -31,13 +31,13 @@ export interface ChatStreamState {
   conversationId: string | null;
   /** The question as typed, kept for Retry. */
   question: string;
-  /** The saved user message, from the `start` event. */
+  /** The saved question, from the `start` event. */
   userMessage: Message | null;
   rewrittenQuery: string | null;
   sources: Source[];
   /** The answer so far; the saved content once done. */
   text: string;
-  /** The saved assistant message, from the `done` event. */
+  /** The saved answer, from the `done` event. */
   message: Message | null;
   error: ChatStreamError | null;
 }

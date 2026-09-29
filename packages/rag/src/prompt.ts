@@ -16,7 +16,7 @@ Rules:
 export const REWRITE_SYSTEM_PROMPT =
   "Rewrite the user's latest message into a single standalone search query that can be understood without the conversation. Resolve pronouns and references from the conversation. Keep names, numbers, codes and quoted terms exactly. Do NOT answer it. Output only the rewritten question.";
 
-/** How much of the conversation goes back into each prompt: enough for follow-ups, bounded in cost. */
+/** Conversation resent with each prompt: enough for follow-ups, bounded in cost. */
 export const PROMPT_LIMITS = {
   answer: { turns: 6, charsPerTurn: 1500 },
   rewrite: { turns: 4, charsPerTurn: 600 },
@@ -44,9 +44,8 @@ export interface RewritePromptInput {
 
 /**
  * Messages for the answer: the rules as the system message, then the recent conversation,
- * then one user message with the sources first and the question last. Long-context
- * guidance (Anthropic's included) is to put the documents before the question, so the
- * model reads the question last, right before it answers, with the evidence already read.
+ * then one user message with the sources first and the question last, as long-context
+ * guidance (Anthropic's included) recommends.
  */
 export function buildAnswerMessages({
   question,
@@ -79,10 +78,9 @@ export function buildRewriteMessages({ question, history }: RewritePromptInput):
 }
 
 /**
- * The last turns of the conversation, ready to resend. Assistant turns lose their [n]
- * markers, because those numbers pointed at the sources of their own turn and would
- * point at the wrong ones now. Empty turns (an aborted answer) are dropped, each turn is
- * capped, and the list starts with a user turn, as chat APIs expect.
+ * The last turns, ready to resend. Assistant turns lose their [n] markers, which pointed at
+ * that turn's sources. Empty turns (an aborted answer) are dropped, each turn is capped,
+ * and the list starts with a user turn, as chat APIs expect.
  */
 function recentTurns(history: readonly HistoryTurn[], limits: TurnLimits): PromptMessage[] {
   const turns = history

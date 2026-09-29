@@ -25,15 +25,13 @@ function requireInteger(name: string, value: number, min: number): void {
   }
 }
 
-/** Windows (CRLF) and old Mac (CR) line endings become LF, so every rule sees one kind of line. */
 export function normalizeNewlines(text: string): string {
   return text.replace(/\r\n?/g, '\n');
 }
 
 /**
- * Characters left for a chunk's content once its header is counted. Keeping content
- * within this budget is what guarantees that
- * buildEmbeddingText(title, headingPath, content).length <= maxChars.
+ * Characters left for content once the header is counted. Content within this budget
+ * keeps buildEmbeddingText(title, headingPath, content).length <= maxChars.
  */
 export function contentBudget(title: string, headingPath: string, maxChars: number): number {
   const headerChars = buildEmbeddingText(title, headingPath, '').length;

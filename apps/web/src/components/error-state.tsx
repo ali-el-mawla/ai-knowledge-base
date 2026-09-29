@@ -14,7 +14,7 @@ interface ErrorStateProps {
   className?: string;
 }
 
-/** Full-width error for a failed query, with the right way out for each kind of failure. */
+/** A failed query, with a way out that fits the failure (sign in again, or retry). */
 export function ErrorState({ error, title, onRetry, className }: ErrorStateProps) {
   const signInAgain = useSignInAgain();
 

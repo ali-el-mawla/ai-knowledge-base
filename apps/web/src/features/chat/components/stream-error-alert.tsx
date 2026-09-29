@@ -28,7 +28,6 @@ function RetryButton({ waitSeconds, onRetry }: { waitSeconds: number; onRetry: (
   );
 }
 
-/** A failed turn, inline in the thread: what went wrong, and Retry when it can help. */
 export function StreamErrorAlert({
   error,
   question,

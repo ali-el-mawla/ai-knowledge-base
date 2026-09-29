@@ -39,7 +39,7 @@ interface DialogProps {
   onCloseAutoFocus?: (event: Event) => void;
 }
 
-/** Rename in a small dialog; it stays open (and busy) until the API answers. */
+/** Stays open (and busy) until the API answers. */
 export function RenameConversationDialog({
   conversation,
   open,
@@ -130,7 +130,7 @@ export function RenameConversationDialog({
   );
 }
 
-/** Delete with a confirmation that stays open (and busy) until the API answers. */
+/** The confirmation stays open (and busy) until the API answers. */
 export function DeleteConversationDialog({
   conversation,
   open,

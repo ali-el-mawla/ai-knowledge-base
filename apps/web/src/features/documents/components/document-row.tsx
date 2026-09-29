@@ -6,8 +6,8 @@ import { formatDateTime, formatRelativeTime } from '@/lib/format';
 import { DocumentStatusBadge } from './document-status-badge';
 
 /**
- * One document in the list. The title link stretches over the whole row (so the row is one
- * click target), while the status badge and tag buttons sit above it and stay interactive.
+ * The title link stretches over the whole row, so the row is one click target; the status
+ * badge and tag buttons sit above it and stay interactive.
  */
 export function DocumentRow({
   document,
@@ -19,9 +19,8 @@ export function DocumentRow({
   return (
     <li className="relative grid gap-1.5 px-4 py-3.5 transition-colors first:rounded-t-xl last:rounded-b-xl hover:bg-muted/50 has-[a:focus-visible]:bg-muted/50">
       <div className="flex items-start gap-3">
-        {/* Up to two lines rather than one truncated line, so a phone shows the title.
-            (A single nowrap line also counted its full width as the minimum width of every
-            grid around it, which pushed the whole page sideways on phones.) */}
+        {/* Up to two lines, so phones show the title. A single nowrap line would also set the
+            minimum width of every grid around it and push the page sideways. */}
         <h2 className="line-clamp-2 min-w-0 flex-1 text-sm font-medium wrap-anywhere sm:text-base">
           <Link
             href={`/documents/${document.id}`}

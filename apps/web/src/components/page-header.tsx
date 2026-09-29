@@ -1,6 +1,5 @@
 import { cn } from '@/lib/utils';
 
-/** Title row of a page: heading and description on the left, actions on the right. */
 export function PageHeader({
   title,
   description,

@@ -2,9 +2,8 @@ import { APIConnectionError, APIConnectionTimeoutError, APIError, APIUserAbortEr
 import { type AiErrorKind, AiProviderError } from '../errors.js';
 
 /**
- * True when a call ended because its AbortSignal fired (the user pressed Stop, or the
- * client went away). An abort is not a provider failure, so it is never wrapped into
- * AiProviderError; callers check this before treating an error as a failure.
+ * True when a call ended because its AbortSignal fired (Stop, or the client went away).
+ * An abort is not a provider failure, so it is never wrapped into AiProviderError.
  */
 export function isAbortError(error: unknown): boolean {
   return (

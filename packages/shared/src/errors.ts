@@ -1,4 +1,4 @@
-/** Every API error has this body, whatever went wrong. */
+/** The body of every API error. */
 export interface ApiErrorBody {
   error: {
     code: ApiErrorCode;

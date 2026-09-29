@@ -31,9 +31,8 @@ const SEARCH_MAX = 200;
 type ListParam = 'q' | 'tag' | 'page';
 
 /**
- * Updates the URL's query string in place. The filters live in the URL so a search can be
- * shared, survives a reload and comes back with the back button. Next.js syncs
- * `history.replaceState` with `useSearchParams`, without a server round trip.
+ * Filters live in the URL so a search can be shared and survives a reload. Next.js syncs
+ * `history.replaceState` with `useSearchParams` without a server round trip.
  */
 function setListParams(updates: Partial<Record<ListParam, string | null>>) {
   const params = new URLSearchParams(window.location.search);
@@ -45,7 +44,6 @@ function setListParams(updates: Partial<Record<ListParam, string | null>>) {
   window.history.replaceState(null, '', query ? `?${query}` : window.location.pathname);
 }
 
-/** The interactive part of /documents: search, tag filter, list, pagination. */
 export function DocumentsView() {
   const searchParams = useSearchParams();
   const q = searchParams.get('q') ?? '';
@@ -170,7 +168,7 @@ export function DocumentsView() {
         <EmptyState
           icon={FilePlus2Icon}
           title="No documents yet"
-          description="Add your first document. It is split into chunks and indexed, so you can search it here and ask questions about it in chat."
+          description="Add a document to search it here and ask the chat about it."
           action={
             <Button asChild>
               <Link href="/documents/new">New document</Link>

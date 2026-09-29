@@ -20,14 +20,14 @@ import type { ChatEventSink } from './chat-event-sink.js';
 import { normalizeRewrite, sameQuestion, titleFromQuestion } from './chat-text.js';
 import { ConversationsService, DEFAULT_CONVERSATION_TITLE } from './conversations.service.js';
 
-/** Generation settings of the chat, next to the retrieval ones in `RETRIEVAL`. */
+/** Chat generation settings; the retrieval ones are in `RETRIEVAL`. */
 export const CHAT_SETTINGS = {
   /**
    * No temperature here: newer models (Claude Sonnet 5, OpenAI reasoning models) reject
    * it. Grounding comes from the prompt rules; CHAT_TEMPERATURE sets one if a model needs it.
    */
   answer: { maxTokens: 1024 },
-  /** Short: a rewrite is one search query, not an answer. */
+  /** A rewrite is one search query. */
   rewrite: { maxTokens: 120 },
   /** A longer "rewrite" means the model answered instead (same cap as a search query). */
   rewriteMaxChars: 500,
@@ -46,7 +46,6 @@ export interface ChatTurnRequest {
   requestId?: string;
 }
 
-/** What a turn needs once streaming has started. */
 interface AnswerContext {
   request: ChatTurnRequest;
   chat: ChatModel;
@@ -98,7 +97,7 @@ export class ChatService {
     const { user, conversationId, question } = request;
 
     const conversation = await this.conversations.getOwned(user, conversationId);
-    // Read before the new question is saved, so the history is exactly the earlier turns.
+    // Read before the new question is saved, so the history holds only the earlier turns.
     const history = await this.conversations.recentHistory(
       user,
       conversationId,
@@ -140,8 +139,7 @@ export class ChatService {
   ): Promise<void> {
     const keepAlive = setInterval(() => sink.comment('keep-alive'), CHAT_SETTINGS.keepAliveMs);
     try {
-      // The ORIGINAL question goes into the prompt: the rewrite exists for retrieval, and
-      // the model should answer what the user actually asked, in their words.
+      // The prompt gets the question as the user typed it; the rewrite is only for retrieval.
       const messages = buildAnswerMessages({
         question: context.request.question,
         sources: context.sources,

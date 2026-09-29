@@ -36,7 +36,7 @@ export interface Message {
   rewrittenQuery: string | null;
   /** Snapshot of the sources given to the model, so citations survive later document edits. */
   sources: Source[];
-  /** Source indexes the answer actually cited, validated server-side. */
+  /** Source indexes the answer cited, validated by the server. */
   citations: number[];
   usage: TokenUsage | null;
   /** "provider/model" that produced an assistant message. */

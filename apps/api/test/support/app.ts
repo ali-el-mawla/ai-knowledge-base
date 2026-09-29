@@ -61,7 +61,7 @@ interface RequestOptions {
   headers?: Record<string, string>;
 }
 
-/** A tiny fetch wrapper that plays the web app: JSON in, JSON out, optional bearer token. */
+/** A fetch wrapper that plays the web app: JSON in and out, optional bearer token. */
 export class ApiClient {
   constructor(
     private readonly baseUrl: string,

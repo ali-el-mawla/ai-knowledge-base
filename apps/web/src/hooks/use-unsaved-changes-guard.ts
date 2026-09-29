@@ -3,9 +3,9 @@ import { useEffect } from 'react';
 const LEAVE_MESSAGE = 'You have unsaved changes. Leave this page and lose them?';
 
 /**
- * Warns before losing unsaved work: on reload, tab close and external navigation (the browser's
- * own `beforeunload` prompt), and on in-app link clicks (a confirm dialog, since the App Router
- * has no API to block its own navigations). The browser back button is not covered.
+ * Warns before losing unsaved work: `beforeunload` for reloads, tab close and external
+ * navigation, and a confirm on in-app link clicks (the App Router cannot block its own
+ * navigations). The browser back button is not covered.
  */
 export function useUnsavedChangesGuard(dirty: boolean): void {
   useEffect(() => {

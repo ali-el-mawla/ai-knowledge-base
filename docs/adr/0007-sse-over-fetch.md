@@ -11,9 +11,9 @@ An answer takes a few seconds (`claude-haiku-4-5`: first token after about 1.4 s
 
 - `POST /api/conversations/:id/messages` answers with `text/event-stream`, read with `fetch`, a `TextDecoderStream` and `createSseParser()` from `@repo/shared`.
 - A typed event union shared by both sides: one `start` (saved question, rewritten query, sources), any number of `delta`, then exactly one `done` or `error`.
-- **Everything that can be refused is checked before the headers go out** (auth, the 20-per-minute rate limit, validation, ownership, chat configuration, retrieval), so those failures are ordinary JSON errors. After the headers, failures are `error` events.
+- Everything that can be refused is checked before the headers go out (auth, the 20-per-minute rate limit, validation, ownership, chat configuration, retrieval), so those failures are ordinary JSON errors. After the headers, failures are `error` events.
 - `Cache-Control: no-cache, no-transform`, `X-Accel-Buffering: no`, and a `: keep-alive` comment every 15 seconds.
-- **A disconnect cancels the model call:** when the response closes unfinished, an `AbortController` aborts the upstream request and the partial answer, if any, is saved as `aborted`. The request's own `close` event would have cancelled every answer at once, because it fires as soon as the body is read.
+- A disconnect cancels the model call: when the response closes unfinished, an `AbortController` aborts the upstream request and the partial answer, if any, is saved as `aborted`. The request's own `close` event would have cancelled every answer at once, because it fires as soon as the body is read.
 
 ## Consequences
 

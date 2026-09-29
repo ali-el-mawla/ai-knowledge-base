@@ -51,10 +51,6 @@ function MessagesSkeleton() {
   );
 }
 
-/**
- * A conversation: its history, the answer being written (when this conversation owns the
- * stream), the composer, and the source panel that citations open.
- */
 export function ConversationView({ conversationId }: { conversationId: string }) {
   const conversation = useConversation(conversationId);
   const deleted = useIsConversationDeleted(conversationId);

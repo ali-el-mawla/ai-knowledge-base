@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 
 export interface CommitInfo {
   hash: string;
-  /** Uncommitted changes in the paths that can move the numbers. */
+  /** Uncommitted changes under EVAL_INPUT_PATHS. */
   dirty: boolean;
 }
 

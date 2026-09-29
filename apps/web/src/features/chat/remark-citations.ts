@@ -43,9 +43,8 @@ function transform(parent: MdastNode): void {
 }
 
 /**
- * Remark plugin: every citation marker in prose becomes a `<sup data-citation="[n]">`
- * element, which the answer renderer turns into clickable source chips. Code (inline and
- * fenced) is a different node type, so "items[1]" in a snippet is never touched.
+ * Turns every citation marker in prose into `<sup data-citation="[n]">`, which the answer
+ * renderer makes into source chips. Code is a different node type, so "items[1]" is safe.
  */
 export function remarkCitations() {
   return (tree: { type: string }) => {

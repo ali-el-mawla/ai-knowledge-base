@@ -17,27 +17,20 @@ import {
   type DocumentListParams,
 } from './api';
 
-/** How often to poll while a document is being chunked and embedded. */
 export const INGESTION_POLL_MS = 1500;
 
 export function isIngesting(status: IngestionStatus): boolean {
   return status === 'pending' || status === 'processing';
 }
 
-/**
- * Query keys, from broad to narrow, so one invalidation can target a whole family
- * (for example every documents list, whatever its filters).
- */
+/** Query keys, from broad to narrow, so one invalidation can target a whole family. */
 export const documentKeys = {
   all: ['documents'] as const,
   lists: () => [...documentKeys.all, 'list'] as const,
   list: (params: DocumentListParams) => [...documentKeys.lists(), params] as const,
   details: () => [...documentKeys.all, 'detail'] as const,
   detail: (id: string) => [...documentKeys.details(), id] as const,
-  /**
-   * Chunks belong to one ingestion run. Keying them by `ingestedAt` makes the chunks view
-   * refetch by itself when a new run finishes, with no manual invalidation.
-   */
+  /** Keyed by `ingestedAt`, so the chunks view refetches by itself when a new run finishes. */
   chunks: (id: string, ingestedAt: string | null) =>
     [...documentKeys.detail(id), 'chunks', ingestedAt] as const,
 };
@@ -50,7 +43,7 @@ export function useDocuments(params: DocumentListParams) {
   return useQuery({
     queryKey: documentKeys.list(params),
     queryFn: ({ signal }) => listDocuments(params, signal),
-    // Keep showing the current page while a new search or page loads (no skeleton flash).
+    // Keep the current page on screen while the next one loads (no skeleton flash).
     placeholderData: keepPreviousData,
     refetchInterval: (query) =>
       query.state.data?.items.some((doc) => isIngesting(doc.ingestion.status))
@@ -102,17 +95,13 @@ function useInvalidateCollections() {
     ]);
 }
 
-/** Stores a fresh document from a mutation response in the detail cache. */
 function useSetDocument() {
   const queryClient = useQueryClient();
   return (document: Document) =>
     queryClient.setQueryData(documentKeys.detail(document.id), document);
 }
 
-/**
- * Stops an in-flight poll of the document, so an answer that left the server before the
- * mutation cannot overwrite the mutation's newer result.
- */
+/** Cancels an in-flight poll, so its older answer cannot overwrite the mutation's result. */
 function useCancelDocumentPoll() {
   const queryClient = useQueryClient();
   return (id: string) =>
@@ -160,9 +149,8 @@ export function useReindexDocument(id: string) {
 }
 
 /**
- * Deletes a document and drops its cached detail and chunks. The page showing the document
- * should stop observing it (see `enabled` on `useDocument`) so the removal does not trigger
- * a refetch that would answer 404.
+ * The page showing the document should stop observing it first (`enabled` on `useDocument`),
+ * or removing it from the cache triggers a refetch that answers 404.
  */
 export function useDeleteDocument() {
   const queryClient = useQueryClient();

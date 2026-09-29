@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/sheet';
 import { NavLinks } from './nav-links';
 
-/** On small screens the sidebar collapses into this slide-over menu. */
+/** The sidebar, as a slide-over menu on small screens. */
 export function MobileNav() {
   const [open, setOpen] = useState(false);
 

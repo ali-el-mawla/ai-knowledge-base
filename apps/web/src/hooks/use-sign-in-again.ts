@@ -5,9 +5,8 @@ import { useRouter } from 'next/navigation';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 /**
- * Ends the expired local session and sends the user to the login page, which brings them
- * back here afterwards. Signing out first matters: with a stale session cookie the proxy
- * would bounce /login straight back.
+ * Signs out locally, then goes to /login, which returns here afterwards. Signing out first
+ * matters: with a stale session cookie the proxy would bounce /login straight back.
  */
 export function useSignInAgain() {
   const router = useRouter();

@@ -24,7 +24,7 @@ function ListSkeleton() {
   );
 }
 
-/** "New conversation" and the list of conversations, most recently active first. */
+/** Conversations, most recently active first. */
 export function ConversationSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const conversations = useConversations();
   const { id: activeId } = useParams<{ id?: string }>();

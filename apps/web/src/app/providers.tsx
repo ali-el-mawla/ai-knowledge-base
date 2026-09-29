@@ -5,9 +5,8 @@ import { useState } from 'react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { makeQueryClient } from '@/lib/query-client';
 
-/** Client-side providers shared by every page. */
 export function Providers({ children }: { children: React.ReactNode }) {
-  // One client per browser tab, created lazily so it survives re-renders but not reloads.
+  // One client per tab: created once, kept across re-renders.
   const [queryClient] = useState(makeQueryClient);
 
   return (

@@ -58,7 +58,6 @@ export async function retrieveAll(
   return results;
 }
 
-/** A retrieved chunk answers the question when it is from the gold document and holds the span. */
 export function isHit(chunk: RetrievedChunk, question: Question): boolean {
   return chunk.documentFile === question.document && containsAnswer(chunk.content, question.answer);
 }

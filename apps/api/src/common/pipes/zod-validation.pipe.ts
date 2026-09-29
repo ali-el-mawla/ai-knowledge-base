@@ -3,11 +3,9 @@ import { z } from 'zod';
 import { ValidationError } from '../errors/app-errors.js';
 
 /**
- * Validates one handler parameter against a zod schema from `@repo/shared` (the same
- * schema the web app validates its forms with) and passes on the parsed output, with
- * defaults applied and strings trimmed.
- *
- * `@Body(new ZodValidationPipe(createDocumentSchema)) body: CreateDocumentBody`
+ * Validates a handler parameter against a `@repo/shared` zod schema (the one the web
+ * forms use) and passes on the parsed output, defaults applied and strings trimmed.
+ * Usage: `@Body(new ZodValidationPipe(createDocumentSchema)) body: CreateDocumentBody`
  */
 export class ZodValidationPipe<TSchema extends z.ZodType> implements PipeTransform<
   unknown,

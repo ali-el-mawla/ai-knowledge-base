@@ -11,11 +11,7 @@ import type {
   TokenUsage,
 } from '@repo/ai';
 
-/**
- * Test doubles for the neutral model interfaces. The chat pipeline depends only on
- * `ChatModel` and `EmbeddingModel`, so these replace a real provider with no network,
- * no key and no cost; they are also the proof that the abstraction is swappable.
- */
+/** Test doubles for `ChatModel` and `EmbeddingModel`: no network, no key, no cost. */
 
 /** What a fake chat model does on its next calls. */
 export interface FakeChatScript {
@@ -61,7 +57,6 @@ export class FakeChatModel implements ChatModel {
     yield { type: 'finish', reason: this.script.finishReason ?? 'stop' };
   }
 
-  /** The last request's messages, for asserting on the prompt. */
   lastMessages(): ChatRequest['messages'] {
     const last = this.requests.at(-1);
     if (!last) throw new Error('the fake chat model was never called');

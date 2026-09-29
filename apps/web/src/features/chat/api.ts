@@ -38,9 +38,8 @@ export function getAiInfo(signal?: AbortSignal) {
 }
 
 /**
- * Sends a message and resolves with the raw `text/event-stream` response once the headers
- * arrive. Validation, rate limit and ownership failures happen before streaming, so they
- * reject with an `ApiError` like any other call.
+ * Resolves with the raw `text/event-stream` response once the headers arrive. Validation,
+ * rate limit and ownership failures come before streaming, so they reject with an `ApiError`.
  */
 export function sendMessage(conversationId: string, content: string, signal: AbortSignal) {
   const body: SendMessageBody = { content };

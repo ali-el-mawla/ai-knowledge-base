@@ -1,7 +1,6 @@
 import { AiConfigError } from './errors.js';
 import { getPreset, PRESET_NAMES, type ProviderPreset } from './presets.js';
 
-/** Everything needed to build one chat model client. */
 export interface ChatModelConfig {
   preset: ProviderPreset;
   baseUrl: string;
@@ -63,11 +62,9 @@ function resolveBaseUrl(env: Env, variable: string, preset: ProviderPreset): str
 }
 
 /**
- * Reads the AI configuration from environment variables.
- *
- * Embeddings are required (documents cannot be indexed without them), so their
- * problems throw. Chat is optional: without it the API still stores, indexes and
- * searches documents, and the chat endpoint answers 503 with the reason.
+ * Embedding problems throw, because documents cannot be indexed without embeddings.
+ * Chat is optional: without it the API still stores, indexes and searches documents,
+ * and the chat endpoint answers 503 with the reason.
  */
 export function loadAiConfig(env: Env): AiConfig {
   return { ...loadChatConfig(env), embedding: loadEmbeddingConfig(env) };

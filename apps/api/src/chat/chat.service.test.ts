@@ -98,7 +98,6 @@ class InMemoryConversations {
     );
   }
 
-  /** Seeds earlier turns, as if they had been sent before. */
   seed(...turns: [role: Message['role'], content: string, status?: Message['status']][]): void {
     for (const [role, content, status = 'complete'] of turns) {
       this.push({ conversationId: CONVERSATION_ID, role, content, status });
@@ -170,7 +169,7 @@ class RecordingSink implements ChatEventSink {
 interface SetupOptions {
   answer?: FakeChatScript;
   rewrite?: FakeChatScript;
-  /** null: chat is not configured. */
+  /** false: chat is not configured. */
   chatConfigured?: boolean;
 }
 

@@ -1,8 +1,7 @@
 /**
- * Reduces markdown to comparable plain text. Chunk text is raw markdown, and a chunk
- * boundary can reflow it: a sentence may wrap onto a new line, a table cell keeps its
- * pipes, a phrase may sit inside `**bold**` or backticks. Both the chunk and the answer
- * go through the same reduction, so the comparison is about words, not formatting.
+ * Reduces markdown to comparable plain text. Chunks are raw markdown: a sentence may wrap
+ * onto a new line, a table cell keeps its pipes, a phrase may sit inside `**bold**` or
+ * backticks. Chunk and answer go through the same reduction, so only the words count.
  */
 export function normalizeForMatch(text: string): string {
   return text

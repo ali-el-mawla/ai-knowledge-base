@@ -5,7 +5,6 @@ import type { AppRequest } from '../common/http/app-request.js';
 import { IS_PUBLIC_KEY } from './public.decorator.js';
 import { TokenVerifier } from './token-verifier.js';
 
-/** The token from an `Authorization: Bearer <token>` header, or null. */
 export function extractBearerToken(header: string | undefined): string | null {
   const match = header ? /^Bearer\s+(\S+)\s*$/i.exec(header) : null;
   return match?.[1] ?? null;

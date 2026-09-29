@@ -21,9 +21,8 @@ import {
 } from './run-cli.js';
 
 /**
- * `npm run seed`: the demo user and the fixture corpus, indexed and ready to chat with.
- * Idempotent: the user is created once, a document is created only if the user has
- * none with the same title, and a second run changes nothing.
+ * `npm run seed`: creates the demo user and indexes the fixture corpus. Idempotent: a
+ * document is created only if the user has none with the same title.
  */
 
 const DEMO_EMAIL = 'demo@quaylark.test';
@@ -73,10 +72,9 @@ void runCli(async (app, config) => {
   const corpus = await readCorpus(CORPUS_DIR);
   if (corpus.length === 0) throw new CliError(`No markdown files found in ${CORPUS_DIR}`);
 
-  // Documents are created as the demo user, through the same DocumentsService and
-  // user-scoped client as POST /documents: RLS, column grants and the auth.uid() owner
-  // default apply exactly as for a real user, and ingestion is queued the same way.
-  // Inserting with the admin client and an explicit user_id would skip all of that.
+  // Created as the demo user through DocumentsService, like POST /documents, so RLS,
+  // column grants, the auth.uid() owner default and ingestion queueing all apply. The
+  // admin client with an explicit user_id would skip them.
   const asUser = supabase.forUser(user.accessToken);
   const { data: existingRows, error } = await asUser
     .from('documents')

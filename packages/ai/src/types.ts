@@ -1,7 +1,6 @@
 /**
- * The application talks to language models only through these interfaces.
- * They use neutral types (no OpenAI SDK types leak out), so an implementation
- * for a non-OpenAI-compatible API could be added without touching callers.
+ * The app reaches language models only through these interfaces. No SDK types leak out,
+ * so a non-OpenAI-compatible implementation can be added without touching callers.
  */
 
 export interface ModelDescriptor {
@@ -19,9 +18,8 @@ export interface ChatMessage {
 
 export interface ChatRequest {
   messages: ChatMessage[];
-  /** Upper bound on generated tokens. */
   maxTokens: number;
-  /** 0 to 1; clamped to the provider's supported range. */
+  /** Clamped to the provider's supported range. */
   temperature?: number;
 }
 
@@ -56,9 +54,9 @@ export interface ChatModel {
 }
 
 /**
- * Many embedding models are trained with different inputs for stored passages and
- * for search queries (nomic-embed-text needs "search_document: " / "search_query: "
- * prefixes). Callers say which one they are embedding; the model applies the rule.
+ * Many embedding models expect different input for stored passages and for queries
+ * (nomic-embed-text needs "search_document: " or "search_query: "). Callers say which
+ * they are embedding and the model adds the prefix.
  */
 export type EmbeddingPurpose = 'document' | 'query';
 

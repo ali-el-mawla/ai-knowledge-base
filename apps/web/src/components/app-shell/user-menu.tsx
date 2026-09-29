@@ -30,7 +30,7 @@ export function UserMenu({ email }: { email: string }) {
       toast.error('Could not sign out', { description: error.message });
       return;
     }
-    // Drop every cached response so the next user of this tab starts clean.
+    // The next user of this tab starts with an empty cache.
     queryClient.clear();
     router.replace('/login');
     router.refresh();

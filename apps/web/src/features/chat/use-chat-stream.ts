@@ -33,7 +33,6 @@ interface Run {
   userMessage: Message | null;
   rewrittenQuery: string | null;
   sources: Source[];
-  /** Everything received so far. */
   text: string;
   /** Received but not rendered yet: deltas are batched into one render per frame. */
   pending: string;
@@ -82,7 +81,6 @@ function isAbortError(error: unknown): boolean {
   return error instanceof DOMException && error.name === 'AbortError';
 }
 
-/** Renders the text received since the last frame, now. */
 function flush(run: Run, dispatch: Dispatch): void {
   if (run.frame !== null) {
     cancelFrame(run.frame);
@@ -94,7 +92,7 @@ function flush(run: Run, dispatch: Dispatch): void {
   }
 }
 
-/** The unfinished answer as the server stores it (content so far, validated citations). */
+/** The partial answer, shaped like the copy the server saves. */
 function unfinishedAnswer(run: Run, userMessage: Message, status: 'aborted' | 'error'): Message {
   return {
     id: `local-${userMessage.id}`,
@@ -112,9 +110,8 @@ function unfinishedAnswer(run: Run, userMessage: Message, status: 'aborted' | 'e
 }
 
 /**
- * Puts an unfinished turn into the cached history, the way the server saves it (the question,
- * and the partial answer when there is one), so the thread matches what a reload shows. The
- * cache is marked stale: the next visit replaces this copy with the server's.
+ * Adds an unfinished turn to the cached history the way the server saves it, so the thread
+ * matches a reload. The cache is marked stale so the next visit loads the server's copy.
  */
 function keepUnfinishedTurn(queryClient: QueryClient, run: Run, status: 'aborted' | 'error') {
   const { userMessage } = run;
@@ -132,14 +129,14 @@ function keepUnfinishedTurn(queryClient: QueryClient, run: Run, status: 'aborted
 }
 
 export interface UseChatStreamOptions {
-  /** Opens the event stream; injectable for tests. */
+  /** Injectable for tests. */
   sendMessage?: SendMessageFn;
 }
 
 /**
- * Sends a chat message and follows its server-sent events (see `stream-state.ts` for the
- * states). The finished turn is written into the TanStack Query cache, so the thread shows
- * the same history a reload would. One request at a time; unmounting stops it.
+ * Sends a chat message and follows its server-sent events (states in `stream-state.ts`).
+ * The finished turn goes into the query cache, so the thread shows what a reload would.
+ * One request at a time; unmounting stops it.
  */
 export function useChatStream({ sendMessage = sendMessageRequest }: UseChatStreamOptions = {}) {
   const queryClient = useQueryClient();
@@ -295,7 +292,6 @@ export function useChatStream({ sendMessage = sendMessageRequest }: UseChatStrea
     if (run?.settled) await send(run.conversationId, run.question);
   }, [send]);
 
-  /** Clears a settled turn (for example, dismissing an error). */
   const reset = useCallback(() => dispatch({ type: 'reset' }), []);
 
   // Leaving the chat closes the connection; the server keeps the partial answer.

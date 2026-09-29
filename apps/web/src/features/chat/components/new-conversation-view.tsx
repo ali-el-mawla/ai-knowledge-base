@@ -15,9 +15,8 @@ import { ComposerBar, useSendBlockedReason } from './composer-bar';
 import { ConversationView } from './conversation-view';
 
 /**
- * /chat: the intro and a composer. The conversation is created on the first send; the
- * answer starts streaming at once and the URL moves to /chat/[id]. Until the router has
- * switched pages, this view already shows the new conversation, so nothing flickers.
+ * /chat. The conversation is created on the first send and the URL moves to /chat/[id];
+ * until the router has switched pages, this view already shows it, so nothing flickers.
  */
 export function NewConversationView() {
   const router = useRouter();

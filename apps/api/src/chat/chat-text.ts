@@ -1,5 +1,3 @@
-/** Small pure text helpers of the chat pipeline. */
-
 export const TITLE_MAX_CHARS = 60;
 
 /** A sidebar title from the first question: whitespace collapsed, cut on a word boundary. */

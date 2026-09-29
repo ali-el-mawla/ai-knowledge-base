@@ -8,7 +8,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 
 const COPIED_MS = 2000;
 
-/** Copies text to the clipboard and confirms with a check mark for a moment. */
 export function CopyButton({ text, label }: { text: string; label: string }) {
   const [copied, setCopied] = useState(false);
 

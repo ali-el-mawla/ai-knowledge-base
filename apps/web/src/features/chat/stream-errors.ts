@@ -7,7 +7,6 @@ export interface StreamErrorCopy {
   retryable: boolean;
 }
 
-/** What to tell the user about a failed turn, and whether Retry makes sense. */
 export function describeStreamError(error: ChatStreamError): StreamErrorCopy {
   switch (error.code) {
     case 'CHAT_NOT_CONFIGURED':

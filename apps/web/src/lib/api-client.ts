@@ -2,10 +2,10 @@ import type { ApiErrorBody, ApiErrorCode } from '@repo/shared';
 import { getPublicEnv } from '@/lib/env';
 import { getAccessToken } from '@/lib/supabase/client';
 
-/** Codes produced by the client itself, when there is no usable answer from the API. */
+/** Codes the client adds when the API gave no usable answer. */
 export type ClientErrorCode = 'NETWORK_ERROR' | 'INVALID_RESPONSE';
 
-/** Every failed API call rejects with this, so the UI can branch on `code` and `status`. */
+/** Every failed API call rejects with this. */
 export class ApiError extends Error {
   override readonly name = 'ApiError';
   readonly code: ApiErrorCode | ClientErrorCode;
@@ -42,7 +42,7 @@ export function isApiError(error: unknown): error is ApiError {
   return error instanceof ApiError;
 }
 
-/** A message that is safe to show to the user for any thrown value. */
+/** A message safe to show the user, for any thrown value. */
 export function getErrorMessage(error: unknown): string {
   if (error instanceof ApiError) return error.message;
   if (error instanceof Error && error.message) return error.message;
@@ -80,10 +80,7 @@ function codeForStatus(status: number): ApiErrorCode | ClientErrorCode {
   }
 }
 
-/**
- * `Retry-After` as whole seconds: the header holds either a number of seconds or an HTTP
- * date. Anything unreadable gives null, so callers fall back to their own wording.
- */
+/** `Retry-After` (seconds or an HTTP date) as whole seconds, or null when unreadable. */
 export function parseRetryAfter(value: string | null, now: number = Date.now()): number | null {
   if (!value) return null;
   const trimmed = value.trim();
@@ -93,7 +90,7 @@ export function parseRetryAfter(value: string | null, now: number = Date.now()):
   return Math.max(0, Math.ceil((date - now) / 1000));
 }
 
-/** Builds an `ApiError` from a non-2xx response, preferring the API's own error body. */
+/** Prefers the API's own error body over a generic message for the status. */
 export async function parseErrorResponse(response: Response): Promise<ApiError> {
   const body: unknown = await response.json().catch(() => null);
   const retryAfter = parseRetryAfter(response.headers.get('retry-after'));
@@ -125,7 +122,7 @@ export interface RequestOptions {
 }
 
 export interface ApiClientConfig {
-  /** Base URL including the `/api` prefix. A function so it is resolved lazily. */
+  /** Includes the `/api` prefix. A function so it is resolved lazily. */
   baseUrl: string | (() => string);
   getAccessToken: () => Promise<string | null>;
   fetch?: typeof fetch;
@@ -133,7 +130,7 @@ export interface ApiClientConfig {
 
 export interface ApiClient {
   request<T>(method: string, path: string, options?: RequestOptions): Promise<T>;
-  /** Like `request`, but hands back the raw response (for streams). Errors are still thrown. */
+  /** The raw response, for streams. Errors are still thrown. */
   raw(method: string, path: string, options?: RequestOptions): Promise<Response>;
   get<T>(path: string, options?: Omit<RequestOptions, 'body'>): Promise<T>;
   post<T>(path: string, body?: unknown, options?: Omit<RequestOptions, 'body'>): Promise<T>;
@@ -150,10 +147,7 @@ function buildUrl(baseUrl: string, path: string, query?: QueryParams): string {
   return url.toString();
 }
 
-/**
- * A small typed wrapper around `fetch` for the API: attaches the Supabase access token,
- * serialises JSON bodies, parses JSON answers and turns every failure into an `ApiError`.
- */
+/** Typed `fetch` for the API: adds the access token and turns every failure into an `ApiError`. */
 export function createApiClient(config: ApiClientConfig): ApiClient {
   const fetchImpl = config.fetch ?? ((...args: Parameters<typeof fetch>) => fetch(...args));
 
@@ -173,7 +167,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         signal: options.signal,
       });
     } catch (error) {
-      // Aborts are intentional (TanStack Query cancels stale requests); let them through as-is.
+      // Aborts are intentional (TanStack Query cancels stale requests): rethrow as-is.
       if (error instanceof DOMException && error.name === 'AbortError') throw error;
       throw new ApiError({
         code: 'NETWORK_ERROR',
@@ -213,7 +207,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
   };
 }
 
-/** The app-wide client: API URL from the environment, token from the browser Supabase session. */
+/** Token from the browser's Supabase session. */
 export const apiClient = createApiClient({
   baseUrl: () => getPublicEnv().apiUrl,
   getAccessToken,

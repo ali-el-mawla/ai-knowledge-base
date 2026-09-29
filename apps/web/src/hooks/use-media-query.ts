@@ -4,7 +4,7 @@ function canMatch(): boolean {
   return typeof window !== 'undefined' && typeof window.matchMedia === 'function';
 }
 
-/** Whether a CSS media query matches, kept in sync with the window. False on the server. */
+/** False on the server. */
 export function useMediaQuery(query: string): boolean {
   const subscribe = useCallback(
     (onChange: () => void) => {

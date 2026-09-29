@@ -7,11 +7,10 @@ import { type DocumentVersion, IngestionRepository } from '../ingestion/ingestio
 import { describeOutcome, ingestionWorker, runCli, seconds, sumOutcomes } from './run-cli.js';
 
 /**
- * `npm run reembed`: the fix after changing the embedding model (EMBEDDING_PROVIDER /
- * EMBEDDING_MODEL). Retrieval only searches chunks made by the configured model, so
- * documents indexed with another one are invisible until rebuilt. This finds them (and
- * documents whose last ingestion failed) for every user, bumps their version so a new
- * chunk generation is written, and indexes them with the configured model.
+ * `npm run reembed`, for after an embedding model change. Retrieval only searches chunks
+ * of the configured model, so documents indexed with another one stay invisible until
+ * rebuilt. Finds them, plus documents whose last ingestion failed, for every user, bumps
+ * their version so a new chunk generation is written, and indexes them again.
  */
 void runCli(async (app, config) => {
   const startedAt = performance.now();

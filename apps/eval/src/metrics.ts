@@ -7,13 +7,11 @@ export interface Rate {
 }
 
 export interface Summary {
-  /** hit@k for each requested k, in the order requested. */
   hitAt: { k: number; rate: Rate }[];
   /** Mean reciprocal rank over the first `cutoff` results. */
   mrr: number;
 }
 
-/** 1-based position of the first result that passes `isHit`, or null. */
 export function firstHitRank<T>(results: readonly T[], isHit: (result: T) => boolean): Rank {
   const index = results.findIndex(isHit);
   return index === -1 ? null : index + 1;
@@ -24,12 +22,11 @@ export function hitAtK(ranks: readonly Rank[], k: number): Rate {
   return { hits: ranks.filter((rank) => rank !== null && rank <= k).length, total: ranks.length };
 }
 
-/** 1/rank, or 0 when there is no hit within the cutoff. */
 export function reciprocalRank(rank: Rank, cutoff: number): number {
   return rank !== null && rank <= cutoff ? 1 / rank : 0;
 }
 
-/** Mean of 1/rank over all questions (a miss counts as 0). 0 for an empty list. */
+/** A miss counts as 0; an empty list gives 0. */
 export function meanReciprocalRank(ranks: readonly Rank[], cutoff: number): number {
   if (ranks.length === 0) return 0;
   const sum = ranks.reduce<number>((total, rank) => total + reciprocalRank(rank, cutoff), 0);

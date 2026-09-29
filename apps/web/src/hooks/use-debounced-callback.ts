@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 
 /**
- * Delays calls to `fn` until `delayMs` have passed without a new call. The latest `fn` is
- * always used, so callers do not need to memoise it. Pending calls are dropped on unmount.
+ * Always calls the latest `fn`, so callers need not memoise it. Pending calls are dropped on
+ * unmount.
  */
 export function useDebouncedCallback<Args extends unknown[]>(
   fn: (...args: Args) => void,

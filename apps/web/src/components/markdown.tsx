@@ -21,10 +21,7 @@ interface MarkdownProps {
   components?: Components;
 }
 
-/**
- * Renders GitHub-flavoured markdown (tables, task lists, strikethrough). Raw HTML in the
- * source is not rendered, so user content cannot inject markup.
- */
+/** GitHub-flavoured markdown. Raw HTML is not rendered, so user content cannot inject markup. */
 export function Markdown({ children, className, remarkPlugins, components }: MarkdownProps) {
   return (
     <div className={cn('markdown', className)}>

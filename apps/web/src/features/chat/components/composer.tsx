@@ -35,7 +35,7 @@ interface ComposerProps {
   /** Why sending is not possible right now; shown above the field. */
   blockedReason?: React.ReactNode;
   placeholder?: string;
-  /** Focus the field on mount (skipped on touch screens, where it would open the keyboard). */
+  /** Skipped on touch screens, where focusing would open the keyboard. */
   autoFocus?: boolean;
   ref?: Ref<ComposerHandle>;
 }
@@ -52,9 +52,8 @@ function fitToContent(field: HTMLTextAreaElement | null) {
 }
 
 /**
- * The message box. Enter sends, Shift+Enter adds a line, Escape stops a streaming answer.
- * The field stays editable while an answer streams, so the next question can be drafted;
- * only sending waits.
+ * Enter sends, Shift+Enter adds a line, Escape stops a streaming answer. The field stays
+ * editable while an answer streams, so the next question can be drafted.
  */
 export function Composer({
   onSend,

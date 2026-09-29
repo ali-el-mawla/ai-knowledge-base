@@ -18,7 +18,7 @@ export function adminClient(): Db {
   });
 }
 
-/** Acts as one signed-in user, exactly like the API's `forUser` client. */
+/** Acts as one signed-in user, like the API's `forUser` client. */
 export function userClient(accessToken: string): Db {
   return createClient<Database>(config.supabase.url, config.supabase.publishableKey, {
     auth: SERVER_AUTH,
@@ -77,7 +77,7 @@ export interface TestChunk {
   headingPath?: string;
 }
 
-/** Writes a chunk generation exactly as the ingestion worker does (secret key, RPC). */
+/** Writes a chunk generation the way the ingestion worker does (secret key, RPC). */
 export async function writeChunksAsWorker(
   documentId: string,
   contentVersion: number,

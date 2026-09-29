@@ -109,7 +109,7 @@ function whatIsMeasured(): string {
     '',
     '- **hit@k**: how many questions have their answer within the first k chunks.',
     `- **MRR@${k}** (mean reciprocal rank): the average of 1/rank over all questions, with 0 for an answer not in the top ${k}. ` +
-      '1.000 means every answer came first; 0.500 is what you get if every answer came second.',
+      '1.000 means every answer ranked first; 0.500 means every answer ranked second.',
     '',
     'Two chunking strategies are crossed with three retrieval modes:',
     '',
@@ -121,8 +121,8 @@ function whatIsMeasured(): string {
     '- **Hybrid**: both lists fused with Reciprocal Rank Fusion, the mode the chat uses.',
     '',
     'Both strategies embed the same header in front of each chunk: the document title, then the heading path when there is one ' +
-      '(naive chunks have none). Each strategy is indexed under its own user and searched as that user, so Row Level Security ' +
-      'keeps the two indexes apart, exactly as it separates real users.',
+      '(naive chunks have none). Each strategy is indexed and searched under its own user, so Row Level Security ' +
+      'keeps the two indexes apart the same way it separates real users.',
   ].join('\n');
 }
 
@@ -176,7 +176,6 @@ function mainResults(input: ReportInput): string {
   return ['## Results', '', table(headers, rows)].join('\n');
 }
 
-/** One row per strategy and mode: hit@k for each k, then MRR. */
 function metricsTable(input: ReportInput): { headers: string[]; rows: string[][] } {
   const rows = summarizeCombos(input).map(({ strategy, mode, summary }) => [
     strategy.label,
@@ -288,7 +287,7 @@ function limitations(input: ReportInput): string {
     '',
     `The sample is small: ${n} question${n === 1 ? '' : 's'}, so one question moves a hit rate by about ${step} percentage points, ` +
       'and a gap of a few questions between two rows can be noise. ' +
-      `The ${n} questions were generated with Claude (an LLM) from the corpus, deliberately paraphrased away from the ` +
+      `The ${n} questions were generated with Claude (an LLM) from the corpus, paraphrased away from the ` +
       'wording of the documents, and every answer span was verified verbatim by `fixtures/verify-questions.mjs`. ' +
       'LLM-generated questions can still share vocabulary with the source and so flatter semantic search, and they come ' +
       'from a single generator; real users phrase things less predictably. ' +

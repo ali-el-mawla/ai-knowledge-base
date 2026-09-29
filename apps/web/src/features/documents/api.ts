@@ -8,7 +8,6 @@ import type {
 } from '@repo/shared';
 import { apiClient } from '@/lib/api-client';
 
-/** Query parameters of `GET /documents`. */
 export type DocumentListParams = {
   q?: string;
   tag?: string;
@@ -38,7 +37,7 @@ export function deleteDocument(id: string) {
   return apiClient.delete(documentPath(id));
 }
 
-/** Forces a full re-embedding of the document (answers 202 with the document). */
+/** Forces a full re-embedding (answers 202 with the document). */
 export function reindexDocument(id: string) {
   return apiClient.post<Document>(`${documentPath(id)}/reindex`);
 }

@@ -47,9 +47,8 @@ export function toSource(row: HybridSearchRow, index: number): Source {
 }
 
 /**
- * Hybrid retrieval over the caller's own chunks: vector similarity and full-text search,
- * fused with Reciprocal Rank Fusion inside Postgres (`hybrid_search`). The query runs
- * through the user's client, so Row Level Security, not a WHERE clause written here,
+ * Vector and full-text search fused with Reciprocal Rank Fusion inside Postgres
+ * (`hybrid_search`). The query runs through the user's client, so Row Level Security
  * keeps other users' chunks out of the results.
  */
 @Injectable()

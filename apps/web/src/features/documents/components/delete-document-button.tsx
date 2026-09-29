@@ -19,7 +19,7 @@ import { getErrorMessage } from '@/lib/api-client';
 import { pluralize } from '@/lib/format';
 import { useDeleteDocument } from '../queries';
 
-/** Delete with a confirmation dialog that stays open (and busy) until the API answers. */
+/** The confirmation stays open (and busy) until the API answers. */
 export function DeleteDocumentButton({
   document,
   onDeleted,

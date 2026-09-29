@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { TokenVerifier } from './token-verifier.js';
 
 /**
- * Token verification. `SupabaseAuthGuard` is registered as a global guard by AppModule,
- * next to the rate limiter, so the order of the two is explicit in one place.
+ * `SupabaseAuthGuard` is registered as a global guard in AppModule, next to the rate
+ * limiter, so their order is visible in one place.
  */
 @Module({
   providers: [TokenVerifier],

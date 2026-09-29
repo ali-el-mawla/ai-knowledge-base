@@ -18,10 +18,6 @@ export const EXAMPLE_QUESTIONS = [
 /** Only the total matters here, so one row is enough. */
 const DOCUMENT_COUNT_PARAMS = { limit: 1, offset: 0 };
 
-/**
- * What chat does, before the first question: where answers come from, how citations work,
- * three example questions, and a pointer to "New document" when there is nothing to search.
- */
 export function ChatIntro({
   onAsk,
   disabled = false,

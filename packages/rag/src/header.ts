@@ -1,10 +1,9 @@
 import { createHash } from 'node:crypto';
 
 /**
- * Contextual chunk header: "{title} > {heading path}". Prepended to every chunk
- * before embedding, so a chunk from the middle of a document still carries what
- * it is about ("Parental leave" alone is ambiguous; "Employee handbook > Leave
- * policy > Parental leave" is not). A free, deterministic version of contextual retrieval.
+ * Contextual chunk header, "{title} > {heading path}", prepended to every chunk before
+ * embedding: "Parental leave" alone is ambiguous, "Employee handbook > Leave policy >
+ * Parental leave" is not. A free, deterministic form of contextual retrieval.
  */
 export function buildChunkHeader(title: string, headingPath: string): string {
   const path = withoutLeadingTitle(title, headingPath);
@@ -36,9 +35,8 @@ export interface ChunkHashInput {
 }
 
 /**
- * Identifies one embedding. If any input changes (the model, its dimensions, the
- * prefix, the header or the text), the stored vector no longer matches and the
- * hash changes with it; otherwise the vector is reused and the model is not called.
+ * Identifies one embedding. Any change to the model, dimensions, prefix, header or text
+ * changes the hash; an unchanged hash reuses the stored vector without calling the model.
  */
 export function hashChunk(input: ChunkHashInput): string {
   return createHash('sha256')

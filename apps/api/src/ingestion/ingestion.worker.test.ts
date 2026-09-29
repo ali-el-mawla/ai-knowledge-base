@@ -8,7 +8,7 @@ import { IngestionWorker } from './ingestion.worker.js';
 
 /**
  * Stands in for IngestionService. With `hold` on, every job waits until the test
- * calls `finishRunning()`, so the test decides exactly when each job ends.
+ * calls `finishRunning()`, so the test decides when each job ends.
  */
 class FakeIngestionService {
   hold = false;
@@ -45,7 +45,6 @@ class FakeIngestionService {
     return Promise.resolve(this.unfinished);
   }
 
-  /** Ends the job that is running now. */
   async finishRunning(): Promise<void> {
     this.waiting.shift()?.();
     // Let the worker record the outcome and start its next job.

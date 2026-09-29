@@ -11,12 +11,12 @@ Retrieval can only return what chunking produced. Fixed-size windows cut through
 
 `chunkMarkdown` in `@repo/rag`, pure and unit-tested:
 
-1. **Sections first:** the `marked` lexer splits the blocks. Every heading opens a section that is never merged with another, and its heading path travels with each chunk.
-2. **Target about 1,200 characters:** whole blocks are merged until the next one would pass it.
-3. **Hard limit 2,000 characters, header included** (the exact embedded text): about 500 tokens, far below the window.
-4. **Code blocks and tables stay whole** when they fit the limit. Bigger blocks split at natural boundaries: list items, sentences, then words for prose; lines for code and tables, repeating the fence or header rows.
-5. **Overlap only inside a split section:** up to 200 characters of trailing sentences, never across a heading.
-6. **Contextual header:** `Document title > heading path` is prepended before embedding.
+1. Sections first: the `marked` lexer splits the blocks. Every heading opens a section that is never merged with another, and its heading path travels with each chunk.
+2. Target about 1,200 characters: whole blocks are merged until the next one would pass it.
+3. Hard limit 2,000 characters, header included (the exact embedded text): about 500 tokens, far below the window.
+4. Code blocks and tables stay whole when they fit the limit. Bigger blocks split at natural boundaries: list items, sentences, then words for prose; lines for code and tables, repeating the fence or header rows.
+5. Overlap only inside a split section: up to 200 characters of trailing sentences, never across a heading.
+6. Contextual header: `Document title > heading path` is prepended before embedding.
 
 A naive fixed-size chunker with the same limits is the evaluation baseline.
 

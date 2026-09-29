@@ -1,8 +1,8 @@
 /**
- * The part of the database schema the evaluation touches, in the shape `supabase gen types`
- * produces. The full generated file lives in apps/api and an app cannot import from another
- * app, so the two tables and two functions used here are restated. Aliases (not interfaces)
- * on purpose: supabase-js checks them against index-signature types.
+ * The part of the schema the evaluation touches, in `supabase gen types` shape. The full
+ * generated file lives in apps/api, which another app cannot import, so the two tables and
+ * two functions used here are restated. Type aliases, not interfaces: supabase-js checks
+ * them against index-signature types.
  */
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 

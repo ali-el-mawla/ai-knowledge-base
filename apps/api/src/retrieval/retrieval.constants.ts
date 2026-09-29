@@ -1,22 +1,21 @@
 import type { RetrievalMode } from '@repo/shared';
 
 /**
- * Retrieval tuning, in one place on purpose: these numbers decide answer quality and cost.
+ * Retrieval settings; these numbers decide answer quality and cost.
  *
- * - `chatSources` (6): chunks given to the model per answer. Chunks target 1,200
- *   characters (the demo corpus averages about 490, since its sections are short), so 6
- *   sources are at most about 1,800 tokens of evidence and usually far less: enough for an answer
- *   spread over a few sections, small enough that the relevant chunk is not buried and
- *   every answer stays cheap. It is also the default `limit` of `POST /search`.
- * - `rrfK` (60): the constant of Reciprocal Rank Fusion, `score = sum(weight / (k + rank))`,
- *   as proposed by Cormack et al. (2009). A large k flattens the gap between rank 1 and
- *   rank 5, so a chunk that both arms rank fairly high beats one that only a single arm
- *   ranks first. Fusion uses ranks, not raw scores, because cosine distance and ts_rank
- *   live on different scales.
- * - `candidatesPerArm` (30): how many chunks the vector arm and the keyword arm each
- *   return before fusion (5x the sources). A chunk only earns both terms when it is in
- *   both lists, so the lists must be longer than the result. 30 also stays under
- *   pgvector's default `hnsw.ef_search` of 40, so one index pass can fill the vector arm.
+ * - `chatSources` (6): chunks given to the model per answer, and the default `limit` of
+ *   `POST /search`. Chunks target 1,200 characters (the demo corpus averages about 490),
+ *   so 6 sources are at most about 1,800 tokens of evidence and usually far less: enough
+ *   for an answer spread over a few sections, few enough that the relevant chunk is not
+ *   buried and answers stay cheap.
+ * - `rrfK` (60): the Reciprocal Rank Fusion constant, `score = sum(weight / (k + rank))`,
+ *   from Cormack et al. (2009). A large k flattens the gap between rank 1 and rank 5, so a
+ *   chunk both arms rank fairly high beats one that only a single arm ranks first. Fusion
+ *   uses ranks because cosine distance and ts_rank live on different scales.
+ * - `candidatesPerArm` (30): chunks each arm returns before fusion (5x the sources). A
+ *   chunk earns both terms only when it is in both lists, so the lists must be longer than
+ *   the result. 30 also stays under pgvector's default `hnsw.ef_search` of 40, so one
+ *   index pass can fill the vector arm.
  */
 export const RETRIEVAL = {
   chatSources: 6,

@@ -3,7 +3,6 @@ import { DatabaseError } from '../common/errors/app-errors.js';
 import type { Tables } from '../database.types.js';
 import { SupabaseService } from '../supabase/supabase.service.js';
 
-/** What a job needs from the document row. */
 export type IngestionDocument = Pick<
   Tables<'documents'>,
   'id' | 'title' | 'content' | 'content_version' | 'ingestion_status'
@@ -73,7 +72,6 @@ export class IngestionRepository {
     if (error) throw new DatabaseError('mark document processing', error);
   }
 
-  /** Hashes of the vectors already stored for this document by this embedding model. */
   async storedHashes(documentId: string, embeddingModel: string): Promise<Set<string>> {
     const { data, error } = await this.supabase
       .admin()

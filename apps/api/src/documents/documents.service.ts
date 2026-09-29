@@ -29,7 +29,6 @@ const RANGE_NOT_SATISFIABLE = 'PGRST103';
 
 const SEARCHABLE_COLUMNS = ['title', 'content'] as const;
 
-/** The query builder methods the list filters need. */
 interface Filterable<T> {
   contains(column: 'tags', value: string[]): T;
   or(filters: string): T;
@@ -47,9 +46,8 @@ function applyListFilters<T extends Filterable<T>>(
 }
 
 /**
- * Document use cases. Every read and write a user asks for runs through a client
- * scoped to that user (`forUser`), so Row Level Security, not this code, guarantees
- * ownership: another user's document simply does not exist here and becomes a 404.
+ * User reads and writes run through a client scoped to that user (`forUser`), so Row
+ * Level Security enforces ownership and another user's document is a 404.
  */
 @Injectable()
 export class DocumentsService {
@@ -99,9 +97,9 @@ export class DocumentsService {
   }
 
   /**
-   * Re-ingests only when the title or content really changed. The database trigger
-   * is the judge: it bumps `content_version` on such a change and leaves it alone for
-   * tag edits or no-op writes, so comparing versions tells whether to enqueue.
+   * Re-ingests only when the title or content changed. The database trigger bumps
+   * `content_version` on such a change and not on tag edits or no-op writes, so
+   * comparing versions tells whether to enqueue.
    */
   async update(user: AuthUser, id: string, body: UpdateDocumentBody): Promise<Document> {
     const db = this.supabase.forUser(user.accessToken);
@@ -141,10 +139,9 @@ export class DocumentsService {
   }
 
   /**
-   * Forces re-embedding (e.g. after changing the embedding model). Users may not write
-   * `content_version` or the ingestion state (column grants), so ownership is proven
-   * with the user's client first and only then is the admin client used, filtered by
-   * owner as a second lock.
+   * Forces re-embedding. Users cannot write `content_version` or the ingestion state
+   * (column grants), so ownership is checked with the user's client first, then the
+   * admin client updates the row, filtered by owner as well.
    */
   async reindex(user: AuthUser, id: string): Promise<Document> {
     const versionBefore = await this.contentVersion(this.supabase.forUser(user.accessToken), id);

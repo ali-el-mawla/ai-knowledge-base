@@ -8,15 +8,13 @@ import type {
 import type { Tables } from '../database.types.js';
 
 /**
- * Row shapes and their mapping to the shared DTOs (snake_case rows in, camelCase
- * contracts out). The select lists live next to the row types they produce, so the
- * two cannot drift apart. `user_id` is never selected: ownership is implied by RLS.
+ * Select lists sit next to the row types they produce so the two stay in sync.
+ * `user_id` is never selected: RLS already implies ownership.
  */
 const METADATA_COLUMNS =
   'id, title, tags, content_version, ingestion_status, ingestion_error, chunk_count, ingested_at, created_at, updated_at';
 type MetadataRow = Omit<Tables<'documents'>, 'user_id' | 'content' | 'excerpt'>;
 
-/** One document, full content included. */
 export const DOCUMENT_COLUMNS = `${METADATA_COLUMNS}, content` as const;
 export type DocumentRow = MetadataRow & Pick<Tables<'documents'>, 'content'>;
 
@@ -101,8 +99,7 @@ function normaliseText(text: string): string {
 
 /**
  * Drops the first line when it is a heading that repeats the title (most documents open
- * with one), so a list that already shows the title does not show it twice. Any other
- * opening heading is kept.
+ * with one), so the list does not show the title twice. Other opening headings stay.
  */
 export function withoutTitleHeading(content: string, title: string): string {
   const body = content.replace(/^\s*\n/, ''); // leading blank lines
@@ -117,10 +114,7 @@ function headingToSentence(_line: string, text: string): string {
   return !text || /[.!?:;]$/.test(text) ? text : `${text}.`;
 }
 
-/**
- * Plain-text preview of markdown for list views: markup roughly removed, whitespace
- * collapsed, cut on a word boundary. Not a markdown parser, and does not need to be.
- */
+/** Rough plain-text preview of markdown for list views, cut on a word boundary. */
 export function toExcerpt(content: string, maxLength = EXCERPT_LENGTH): string {
   const text = content
     .slice(0, EXCERPT_SCAN_LENGTH)

@@ -30,9 +30,8 @@ export function parseCitations(text: string, sourceCount: number): number[] {
 }
 
 /**
- * Removes citation markers and the spacing they leave behind. Used on earlier assistant
- * turns before they go back into a prompt: their numbers referred to the sources of
- * their own turn, and would point at the wrong sources now.
+ * Removes citation markers and the spacing they leave. Used on earlier assistant turns
+ * before they re-enter a prompt, since their numbers referred to that turn's sources.
  */
 export function stripCitations(text: string): string {
   return text

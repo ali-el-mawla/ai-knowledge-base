@@ -4,7 +4,6 @@ import type { AppConfig } from '../config/app-config.js';
 import { InjectConfig } from '../config/config.module.js';
 import type { Database } from '../database.types.js';
 
-/** A typed supabase-js client for this project's schema. */
 export type Db = SupabaseClient<Database>;
 
 // Server-side clients never store or refresh sessions: the token belongs to the caller.
@@ -21,10 +20,9 @@ export class SupabaseService {
   constructor(@InjectConfig() private readonly config: AppConfig) {}
 
   /**
-   * A client that acts as the signed-in user. PostgREST receives the user's JWT, so
-   * every query runs as role `authenticated` with `auth.uid()` set to the user, and Row
-   * Level Security decides which rows exist. Created per request (no network I/O).
-   * This is the client for everything a user asks for.
+   * The client for user requests. PostgREST receives the user's JWT, so every query runs
+   * as role `authenticated` with `auth.uid()` set to the user, and Row Level Security
+   * decides which rows are visible. Created per request (no network I/O).
    */
   forUser(accessToken: string): Db {
     return createClient<Database>(this.config.supabase.url, this.config.supabase.publishableKey, {

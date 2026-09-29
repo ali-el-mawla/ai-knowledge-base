@@ -9,7 +9,7 @@ interface EmptyStateProps {
   className?: string;
 }
 
-/** Centered message for empty lists, missing records and not-yet-built screens. */
+/** Centered message for empty lists and missing records. */
 export function EmptyState({ icon: Icon, title, description, action, className }: EmptyStateProps) {
   return (
     <div

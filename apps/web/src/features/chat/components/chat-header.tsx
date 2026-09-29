@@ -20,7 +20,7 @@ import { ProviderIndicator } from './provider-indicator';
 /** Tailwind's lg: from here the conversation list is docked next to the chat. */
 const DOCKED_LIST_QUERY = '(min-width: 64rem)';
 
-/** Below lg the conversation list is not docked; this button opens it as a sheet. */
+/** Below lg the conversation list opens as a sheet. */
 function ConversationsSheet() {
   const [open, setOpen] = useState(false);
   // Growing the window past lg docks the list, so the sheet closes.
@@ -47,12 +47,12 @@ function ConversationsSheet() {
   );
 }
 
-/** From lg: shows or hides the docked conversation list (the choice is remembered). */
+/** From lg: shows or hides the docked list (remembered per browser). */
 function DockedListToggle() {
   const list = useDockedConversationList();
   const Icon = list.open ? PanelLeftCloseIcon : PanelLeftOpenIcon;
-  // The label names the action. (aria-expanded would also give the ghost button its
-  // "menu open" background whenever the list is shown, which is most of the time.)
+  // The label names the action. No aria-expanded: it would give the ghost button its
+  // "menu open" background whenever the list is shown, which is most of the time.
   const label = list.open ? 'Hide conversations' : 'Show conversations';
 
   return (
@@ -76,7 +76,6 @@ function DockedListToggle() {
   );
 }
 
-/** Title row of the chat pane: the conversation list toggle, the title and the models in use. */
 export function ChatHeader({ title }: { title: string }) {
   return (
     <header className="flex h-14 shrink-0 items-center gap-2 border-b px-3 sm:px-4">

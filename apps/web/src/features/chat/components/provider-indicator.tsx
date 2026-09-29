@@ -5,12 +5,12 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { describeAiInfo, formatAiInfo } from '../ai-info';
 import { useAiInfo } from '../queries';
 
-/** Which models answer and embed, in one muted line; the tooltip has the details. */
+/** The models in use, in one line; the tooltip has the details. */
 export function ProviderIndicator() {
   const info = useAiInfo();
 
   if (info.isPending) return <Skeleton className="h-3.5 w-56" />;
-  // The indicator is informative only; a failure here must not distract from the chat.
+  // Informative only: a failure here must not distract from the chat.
   if (!info.data) return null;
 
   return (

@@ -2,8 +2,8 @@ import { type ChatStreamEvent, encodeSseEvent } from '@repo/shared';
 import type { Response } from 'express';
 
 /**
- * Where the chat service writes its stream. Keeping HTTP behind this interface lets the
- * service be tested without a server, and keeps SSE framing out of the chat logic.
+ * Where the chat service writes its stream. Keeps SSE framing out of the chat logic and
+ * lets the service be tested without a server.
  */
 export interface ChatEventSink {
   /**
@@ -18,7 +18,6 @@ export interface ChatEventSink {
   end(): void;
 }
 
-/** Adapts an Express response to `ChatEventSink` as a `text/event-stream`. */
 export function createSseSink(res: Response): ChatEventSink {
   // After the client disconnects there is nobody to write to; writes become no-ops.
   const writable = (): boolean => !res.writableEnded && !res.destroyed;

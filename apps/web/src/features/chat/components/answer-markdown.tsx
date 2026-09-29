@@ -61,7 +61,6 @@ interface AnswerMarkdownProps {
   className?: string;
 }
 
-/** An assistant answer: markdown where every valid [n] marker opens its source. */
 export function AnswerMarkdown({
   content,
   sources,

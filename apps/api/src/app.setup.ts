@@ -25,8 +25,8 @@ export function allowedOrigins(webOrigin: string): string[] {
 }
 
 /**
- * HTTP-level setup shared by main.ts and the integration tests, so tests exercise
- * exactly what production runs. Order matters: Express runs these in sequence.
+ * Shared by main.ts and the integration tests, so the tests run the production HTTP
+ * setup. Order matters: Express runs these in sequence.
  */
 export function configureApp(app: NestExpressApplication, config: AppConfig): void {
   app.use(requestIdMiddleware);

@@ -27,7 +27,7 @@ export class AiProviderError extends Error {
   }
 }
 
-/** Configuration problems are programmer/operator errors, reported at startup. */
+/** A configuration mistake, reported at startup. */
 export class AiConfigError extends Error {
   override readonly name = 'AiConfigError';
 }

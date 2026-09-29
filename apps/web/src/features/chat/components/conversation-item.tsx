@@ -17,11 +17,7 @@ import { cn } from '@/lib/utils';
 import { useChatSession } from '../chat-session';
 import { DeleteConversationDialog, RenameConversationDialog } from './conversation-dialogs';
 
-/**
- * One conversation in the sidebar: a link to it, a spinner while it is answering, and an
- * actions menu (rename, delete). The menu button shows on hover or focus with a mouse, and
- * always on touch screens.
- */
+/** The actions button shows on hover or focus with a mouse, and always on touch screens. */
 export function ConversationItem({
   conversation,
   active,
@@ -38,8 +34,8 @@ export function ConversationItem({
   const [dialog, setDialog] = useState<'rename' | 'delete' | null>(null);
   const actionsRef = useRef<HTMLButtonElement>(null);
 
-  // The dialogs open from a menu item that is gone by the time they close, so focus would
-  // fall back to the page; it returns to this conversation's actions button instead.
+  // The menu item that opened a dialog is gone when it closes, so focus would fall back to
+  // the page; send it to this conversation's actions button instead.
   const returnFocus = useCallback((event: Event) => {
     event.preventDefault();
     actionsRef.current?.focus();

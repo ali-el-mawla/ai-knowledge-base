@@ -46,9 +46,9 @@ function LiveAnswer({
 }
 
 /**
- * The saved history, then the turn in progress. The live question is shown from the moment
- * it is sent (the server's copy replaces it on `start`); once the turn settles, the stream
- * hook has written it into the history, so it is not rendered twice.
+ * The saved history, then the turn in progress. The live question shows as soon as it is sent
+ * (the server's copy replaces it on `start`); once the turn settles it is in the history, so
+ * it is not rendered twice.
  */
 export function MessageThread({
   messages,

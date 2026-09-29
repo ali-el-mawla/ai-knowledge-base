@@ -4,10 +4,9 @@ import { isAuthRoute, safeNextPath } from '@/lib/auth-routes';
 import { getPublicEnv } from '@/lib/env';
 
 /**
- * Runs before every page request:
- * 1. refreshes the Supabase session and writes the new auth cookies to the response;
- * 2. sends signed-out visitors to /login (remembering where they were going);
- * 3. sends signed-in users away from /login and /signup (to `next`, or to /documents).
+ * Runs before every page request: refreshes the Supabase session cookies, sends signed-out
+ * visitors to /login (with `next` set to where they were going), and sends signed-in users
+ * away from /login and /signup.
  *
  * This is an optimistic check for navigation. The API verifies the token on every data request.
  */

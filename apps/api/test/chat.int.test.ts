@@ -509,7 +509,7 @@ describe.skipIf(LIVE)('with fake models', () => {
       expect(limited.status).toBe(429);
       expect(limited.body.error.code).toBe('RATE_LIMITED');
       expect(limited.headers.get('retry-after')).toEqual(expect.any(String));
-      // Other routes keep the generous default limit.
+      // Other routes keep the default limit.
       expect((await asCarol.get('/conversations')).status).toBe(200);
     });
   });

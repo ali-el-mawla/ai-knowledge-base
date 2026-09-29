@@ -37,9 +37,8 @@ function subscribe(onChange: () => void) {
 }
 
 /**
- * A yes/no preference remembered in localStorage, shared by every component that uses the
- * same key and kept in sync across tabs. The server render, and a browser with nothing
- * stored, use `fallback`.
+ * A yes/no preference in localStorage, shared by every component using the key and synced
+ * across tabs. The server render and an empty store use `fallback`.
  */
 export function useStoredBoolean(
   key: string,

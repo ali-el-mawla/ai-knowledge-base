@@ -35,7 +35,6 @@ export function formatRelativeTime(iso: string, now: number = Date.now()): strin
   return dateFormat.format(time);
 }
 
-/** Full date and time, for tooltips and `title` attributes. */
 export function formatDateTime(iso: string): string {
   const time = new Date(iso).getTime();
   return Number.isNaN(time) ? '' : dateTimeFormat.format(time);

@@ -1,9 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton';
 
-/**
- * Loading placeholders shaped like the real content, so nothing jumps when data arrives.
- * Server-safe: used both by route `loading.tsx` files and by client components.
- */
+/** Server-safe: used by route `loading.tsx` files and by client components. */
 export function DocumentListSkeleton({ rows = 5 }: { rows?: number }) {
   return (
     <div aria-busy="true" aria-label="Loading documents" className="grid gap-4">
@@ -43,7 +40,6 @@ export function DocumentsPageSkeleton() {
   );
 }
 
-/** Mirrors the editor: the sticky toolbar, then title, tags and the content area. */
 export function EditorSkeleton() {
   return (
     <div aria-busy="true" aria-label="Loading document">

@@ -1,6 +1,5 @@
 import OpenAI from 'openai';
 
-/** Transport settings shared by the chat and embedding models. */
 export interface ClientOptions {
   /** Replaces the global fetch, e.g. with a fake in tests. */
   fetch?: (input: string | URL | Request, init?: RequestInit) => Promise<Response>;

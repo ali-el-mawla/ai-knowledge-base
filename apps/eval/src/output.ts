@@ -1,4 +1,3 @@
-/** Progress and results go to stdout, warnings and errors to stderr. */
 export function log(message = ''): void {
   process.stdout.write(`${message}\n`);
 }
