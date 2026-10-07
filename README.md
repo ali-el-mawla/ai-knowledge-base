@@ -13,6 +13,16 @@ Features:
 - A citation opens the passage as it was when the answer was written, with its section, its semantic and keyword ranks, and a link to the document.
 - Stop mid-answer (the partial text is kept), retry (with a countdown when rate limited), rename and delete conversations. The chat header shows the active models, and each answer shows its model and token usage.
 
+## Screenshots
+
+A cited answer. Clicking a citation opens the exact passage it came from, with its section and its semantic and keyword ranks.
+
+![A chat answer with numbered citations and the source panel open](docs/screenshots/chat-citation.png)
+
+| Documents with their indexing status                  | How a document was split into chunks                     |
+| ----------------------------------------------------- | -------------------------------------------------------- |
+| ![The documents list](docs/screenshots/documents.png) | ![The chunks of a document](docs/screenshots/chunks.png) |
+
 ## Contents
 
 - [Quick start](#quick-start)
