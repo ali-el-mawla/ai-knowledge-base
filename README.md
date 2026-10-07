@@ -13,14 +13,6 @@ Features:
 - A citation opens the passage as it was when the answer was written, with its section, its semantic and keyword ranks, and a link to the document.
 - Stop mid-answer (the partial text is kept), retry (with a countdown when rate limited), rename and delete conversations. The chat header shows the active models, and each answer shows its model and token usage.
 
-## Loom walkthrough
-
-TODO: Loom link
-
-## How I used AI
-
-TODO: Loom link
-
 ## Contents
 
 - [Quick start](#quick-start)
@@ -29,8 +21,10 @@ TODO: Loom link
 - [Swapping AI providers](#swapping-ai-providers)
 - [Evaluation](#evaluation)
 - [Testing and CI](#testing-and-ci)
-- [What I would improve with more time](#what-i-would-improve-with-more-time)
+- [How I built it](#how-i-built-it)
+- [Roadmap](#roadmap)
 - [Known limitations](#known-limitations)
+- [Author](#author)
 - Deeper docs: [ARCHITECTURE.md](docs/ARCHITECTURE.md), [ADRs](docs/adr/), [API.md](docs/API.md), [TESTING.md](docs/TESTING.md), [EVAL.md](docs/EVAL.md), [fixtures/README.md](fixtures/README.md)
 
 ## Quick start
@@ -333,7 +327,11 @@ Per-type and per-question results and the misses are in [docs/EVAL.md](docs/EVAL
 
 Integration tests run the real Nest app against local Postgres with its migrations and RLS, real users and tokens, and fake AI models. [CI](.github/workflows/ci.yml) runs Prettier, lint, typecheck, unit tests and build, then applies every migration to an empty database and runs the integration tests. The e2e test and the eval need real models, so they stay local. Details: [docs/TESTING.md](docs/TESTING.md).
 
-## What I would improve with more time
+## How I built it
+
+I built this in about three days in late September 2026, with Claude Code as my pair programmer. I made the design choices (the security model, the chunking and retrieval strategy, and how to measure them), read and ran what the AI wrote, had a second model review the code, and tested every flow end to end, from sign-up to a cited answer. The [decision records](docs/adr/) explain each choice and what it costs.
+
+## Roadmap
 
 In priority order:
 
@@ -356,3 +354,11 @@ In priority order:
 - `npm run reembed` detects a changed embedding model by name only. After a prefix-only change, a document re-embeds on its next edit or Reindex. A new dimension needs a migration.
 - The conversation sidebar shows the 200 most recent conversations, without paging.
 - A dropped connection ends the answer; the partial text is saved as stopped and the user retries.
+
+## Author
+
+Ali El Mawla, Beirut. [GitHub](https://github.com/ali-el-mawla) · [LinkedIn](https://www.linkedin.com/in/ali-el-mawla) · [Portfolio](https://ali-el-mawla.github.io)
+
+## License
+
+MIT. See [LICENSE](LICENSE).

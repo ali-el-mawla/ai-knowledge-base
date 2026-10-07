@@ -5,7 +5,7 @@
 
 ## Context
 
-Reviewers run the project on their own machines, and it is developed on a laptop with a 2 GB GPU. A hosted Supabase project would mean accounts, keys and shared state for every reviewer; hosted embeddings would mean a second paid key before anything works. Every chat answer costs money, and so would tests that call a model. Documents may be private.
+People who try the project run it on their own machines, and it is developed on a laptop with a 2 GB GPU. A hosted Supabase project would mean accounts, keys and shared state for everyone who tries it; hosted embeddings would mean a second paid key before anything works. Every chat answer costs money, and so would tests that call a model. Documents may be private.
 
 ## Decision
 

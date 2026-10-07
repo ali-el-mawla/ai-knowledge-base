@@ -5,7 +5,7 @@
 
 ## Context
 
-The brief requires that any OpenAI-spec provider can be swapped in by configuration. Providers that speak that format still differ: `max_tokens` or `max_completion_tokens`, the temperature range, whether streamed usage must be requested, whether embeddings accept `dimensions`, batch limits. Some have no embeddings (Anthropic, Groq). The usual failure is `if (provider === 'x')` scattered through the code, or SDK types leaking into every caller.
+A goal of the project is that any OpenAI-compatible provider can be swapped in by configuration. Providers that speak that format still differ: `max_tokens` or `max_completion_tokens`, the temperature range, whether streamed usage must be requested, whether embeddings accept `dimensions`, batch limits. Some have no embeddings (Anthropic, Groq). The usual failure is `if (provider === 'x')` scattered through the code, or SDK types leaking into every caller.
 
 ## Decision
 

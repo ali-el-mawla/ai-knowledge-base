@@ -5,7 +5,7 @@
 
 ## Context
 
-The brief asks for a Turborepo monorepo with a Next.js web app, a NestJS API and shared packages. Reviewers clone and run it, so every extra tool is friction. Both apps share contracts (zod schemas, types, error codes, the SSE codec) and pure logic (chunkers, prompt builder). Nest runs the compiled API on Node, so everything it imports at runtime must be JavaScript.
+The project is a Turborepo monorepo with a Next.js web app, a NestJS API and shared packages. Anyone who clones it should be able to run it, so every extra tool is friction. Both apps share contracts (zod schemas, types, error codes, the SSE codec) and pure logic (chunkers, prompt builder). Nest runs the compiled API on Node, so everything it imports at runtime must be JavaScript.
 
 ## Decision
 
